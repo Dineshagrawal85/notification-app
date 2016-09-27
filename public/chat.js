@@ -59,19 +59,19 @@ sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore
             //console.log('Error: ' + error);
             $scope.errorMessage = "Internal Server Error. Please try after some time"
         });*/
-        if($scope.user.name == "samar"){
+        if($scope.user.user == "samar"){
             user_id = 1
             img_url = "image6.jpg"
-        }else if ($scope.user.name == "ravindra"){
+        }else if ($scope.user.user == "ravindra"){
             user_id = 2
             img_url = "image1.jpg"
         }else{
             user_id = 3
             img_url = "image2.jpg"
         }
-        var user_info = {"user_name":$scope.user.name,"user_id":user_id,"img_url":img_url}
+        var user_info = {"user_name":$scope.user.user,"user_id":user_id,"img_url":img_url}
         $cookieStore.put('user_info',user_info)
-        $state.go('state1',{"user_name":$scope.user.name});
+        $state.go('state1',{"user_name":$scope.user.user});
   }
       
 });
