@@ -1,4 +1,4 @@
-<h2>login</h2>
+<!-- <h2>login</h2>
  
 {{ message }}
 <a href="http://localhost:3000/#/home">Click here to go to dashboard</a>
@@ -8,4 +8,54 @@ Password:<input type="password" ng-model="user.password" placeholder="enter your
 <input type="submit" ng-click="submit()">
 </form>
 {{errorMessage}}
-<a href="http://localhost:3000/#/signup">New user Sign up</a>
+<a href="http://localhost:3000/#/signup">New user Sign up</a> -->
+
+
+<section id="login" class="visible">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-4 col-md-offset-4">
+							<div class="login-box-plain" id="abc">
+								<h2 class="bigintro">Log In</h2>
+								<div id="alert-wrapper" ng-if="errorMessage != ''">
+									<div class="alert alert-danger">
+										<p id ="inValidData" >{{errorMessage}}</p>
+									</div>
+								</div>
+								<form name="form" id="form">
+									<div class="form-group"  id="email-box">
+										<label>User Name</label>
+										<i class="fa fa-envelope"></i>
+										<input type="text" id="email" ng-model="user.user"  type="email" name="email" class="form-control enableKeyEnter" placeholder="User Name Here" required tabIndex="1"/>
+									</div>
+									<div class="form-group">
+										<label>Password</label>
+										<i class="fa fa-lock"></i>
+										<input type="password" id = "password" ng-model="user.password" name = "password" class="form-control enableKeyEnter" name="password" placeholder="Password Here"  tabIndex="2" required />
+									</div>
+									<div class="form-actions">
+										<button type="submit"  id="submitbtn" class="btn btn-lg btn-danger" tabIndex="3" ng-click="submit()">Login</button>
+									</div>
+								</form>
+								<!-- <div class="login-helpers">
+									<a class = "pointerclass" title="Forgot Password" onClick={this.swapForgotPassword}>Forgot Password?</a>
+								</div> -->
+							</div>
+						</div>
+					</div>
+				</div>
+
+<!-- <!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="./assets/css/cloud-admin.css" />
+	</head>
+	<body>
+		
+
+
+			
+
+
+			</body>
+		</html> -->

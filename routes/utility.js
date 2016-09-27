@@ -69,7 +69,7 @@ var startNotification = function(){
       } 
       pool.release(connection);
   });
-    },30000)
+    },60*1000)
 }
 startNotification()
 //module.exports = startNotification
