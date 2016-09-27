@@ -86,7 +86,7 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
     $scope.user_info = $cookieStore.get("user_info")
     console.log("$scope.user_info",$scope.user_info)
     var messages = [];
-    var socket = io.connect('http://localhost:3000');
+    var socket = io.connect('/');
     var field = document.getElementById("field");
     var sendButton = document.getElementById("send");
     var content = document.getElementById("content");
