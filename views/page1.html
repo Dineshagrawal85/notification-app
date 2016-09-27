@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+	<html ng-app="sampleapp">
+			<head>
+				<title>Real time web chat</title>
+				<script src="javascripts/angular_js.min.js"></script>
+				<script src="javascripts/jquery-3.0.0.min.js"></script>
+				<script src="chat.js"></script>
+				<script src="socket.io.js"></script>
+				<link rel="stylesheet" href="angular-notification-icons/dist/angular-notification-icons.min.css">
+				<link rel="stylesheet" href="javascripts/bootstrap.min.css">
+				<link href="javascripts/font-awesome.css" rel="stylesheet">
+				<script type="text/javascript" src="javascripts/clickoutside.directive.js"></script>
+
+<!-- <script src="angular/angular.js"></script> -->
+<script src="angular-animate/angular-animate.js"></script> <!-- Not required, but recommended -->
+<script src="angular-notification-icons/dist/angular-notification-icons.min.js"></script>
+<style>
+	.unread{
+		background: #B9BDE8;
+	}
+	.table-hover>tbody>tr:hover {
+    	background-color: #C6BEE9;
+	}
+</style>
+			</head>
+<body ng-controller="samplecontroller">
+	 <div class="container-fluid">
+    	<div class="row">
+    	<div class="col-md-12">
+    		<div class="col-md-6" style="float:left;">
+    				<div class="panel">
+    						<div class="panel-heading ">
+    						</div>
+    						<div class="panel-body">
+    						<div  style="width: 500px; height: 300px; margin: 0 0 20px 0; border: solid 1px #999; overflow-y: scroll;">
+							<div id="content">
+							</div>
+    						</div>
+    						<div class="controls">
+							<input style="width:350px;" id="field" class="field">
+							<input type="button" value="send" id="send" class="send">
+							</div>
+    						</div>
+    				</div>
+    		</div>
+    		<div class="col-md-6">
+    				<div class="panel">
+    						<div class="panel-heading ">
+    						</div>
+    						<div class="panel-body">
+    						<div style="float: left;">count:{{notification.count}},Read:{{notification.read}}
+					
+							</div>
+							<notification-icon count='notification.count-notification.read' ng-click="updateReadNotificationCount()" outside-click="closeNotificationList()">
+  								<i class="fa fa-envelope-o fa-3x"></i>
+							</notification-icon>
+							<div style="max-height:250px;width:300px;overflow-y:auto;">
+							<!-- <li ng-repeat="i in notification.list track by $index" ng-style="$index < (notification.count-notification.read) && {'background': 'yellow'}" ng-if="showList" >{{i}}</li> -->
+							<table class="table table-bordered table-hover" >
+    
+    						<tbody ng-if="showList">
+							      <tr ng-repeat="activity in notification.list track by $index"  ng-class="$index < (notification.count-notification.read)?'unread':''">
+							      <!-- ng-class = "{'active' : pageType == 'reviewOnly' && currentPage == 'ARCHIVED'}" -->
+							        <td ><img ng-src="/images/{{activity.image}}" style="border: 1px solid gray;height: 40px;
+    width: 35px;"></td><td><strong>{{activity.name}}</strong><br /><span>{{activity.description}}</span></td>
+							      </tr>
+							</tbody>
+							</table>
+							</div>
+    						</div>
+    				</div>
+    		</div>
+    	</div>
+    </div>
+	</div>
+		
+	
+				 
+				<!-- <div class="container">
+				<div class="row">
+  					<div class="col-sm-4">.col-sm-4</div>
+  					<div class="col-sm-8">.col-sm-8</div>
+				</div>
+				</div> -->
+			</body>
+	</html>
+
+<!-- doctype html
+html
+    head
+        title= "Real time web chat"
+        script(src='/chat.js')
+        script(src='socket.io.js')
+    body
+        #content(style='width: 500px; height: 300px; margin: 0 0 20px 0; border: solid 1px #999; overflow-y: scroll;')
+        .controls
+            input.field(style='width:350px;',id='field')
+            input.send(type='button', value='send', id='send') -->
+

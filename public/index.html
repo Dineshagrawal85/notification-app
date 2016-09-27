@@ -1,0 +1,41 @@
+<!-- index.html -->
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Real time web chat</title>
+        <script src="javascripts/jquery-3.0.0.min.js"></script>
+        <script src="javascripts/angular_js.min.js"></script>
+        <script src="angular-ui-router/release/angular-ui-router.min.js"></script>
+        <script src="chat.js"></script>
+        <script src="socket.io.js"></script>
+        <link rel="stylesheet" href="angular-notification-icons/dist/angular-notification-icons.min.css">
+        <link rel="stylesheet" href="javascripts/bootstrap.min.css">
+        <link href="javascripts/font-awesome.css" rel="stylesheet">
+        <script type="text/javascript" src="javascripts/clickoutside.directive.js"></script>
+        <script type="text/javascript" src="javascripts/angular-cookies.min.js"></script>
+        <script src="angular-local-storage/dist/angular-local-storage.min.js"></script>
+
+<!-- <script src="angular/angular.js"></script> -->
+<script src="angular-animate/angular-animate.js"></script> <!-- Not required, but recommended -->
+<script src="angular-notification-icons/dist/angular-notification-icons.min.js"></script>
+<style>
+  .unread{
+    background: #B9BDE8;
+  }
+  .table-hover>tbody>tr:hover {
+      background-color: #C6BEE9;
+  }
+</style>
+      </head>
+    <body ng-app="sampleapp" ng-controller="mainCtrl"  >
+
+<div class="container" >
+        <br/>
+        <div class="row">
+          <div class="col-md-12">
+              <div ui-view></div>
+          </div>
+        </div>
+    </div>
+    </body>
+    </html>

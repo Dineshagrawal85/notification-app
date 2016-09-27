@@ -1,0 +1,91 @@
+
+	 <div class="container-fluid">
+    	<div class="row">
+    	<div class="col-md-12">
+    		<div class="col-md-6" style="float:left;">
+    				<div class="panel">
+    						<div class="panel-heading ">
+                            Public Chat Pannel
+    						</div>
+    						<div class="panel-body">
+    						<div  style="width: 500px; height: 300px; margin: 0 0 20px 0; border: solid 1px #999; overflow-y: scroll;">
+							<div id="content">
+							</div>
+    						</div>
+    						<div class="controls">
+							<input style="width:350px;" id="field" class="field">
+							<input type="button" value="send" id="send" class="send">
+							</div>
+    						</div>
+    				</div>
+
+                    <div class="panel" ng-show="privateChatSession.enable">
+                            <div class="panel-heading ">
+                            Private Chat Pannel - {{privateChatSession.destinationUserDetails}}
+                            <br />
+                            <div ng-click="closePrivateChat()">Close Private Chat</div>
+                            </div>
+                            <div class="panel-body">
+                            <div  style="width: 500px; height: 300px; margin: 0 0 20px 0; border: solid 1px #999; overflow-y: scroll;">
+                            <div id="private_chat_content">
+                            </div>
+                            </div>
+                            <div class="controls">
+                            <input style="width:350px;" ng-model="privateChatSession.input">
+                            <input type="button" value="send" ng-click = "privateChatSessionSubmit()">
+                            </div>
+                            </div>
+                    </div>
+
+                    <div>
+                        Socket List:
+                        {{activeSockets}}
+                        <ul>
+                            <li ng-repeat="obj in activeSockets" ng-click="startPrivateChat(obj)">
+                                <div>{{obj["user_name"]}}</div>
+                                <div>{{obj["img_url"]}}</div>
+                            </li>
+                        </ul>
+                        <br />
+                        <div>
+                            <div ng-if="chatProposals.length>0">
+                                Private Chat Proposal Request:
+                                <div ng-repeat = "proposals in chatProposals">
+                                    {{proposals['message']}}
+                                    <span ng-click="privateChatResponse(proposals,true)">Click Here To Accept</span>
+                                    <span ng-click="privateChatResponse(proposals,false)">Click Here To Reject</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    		</div>
+    		<div class="col-md-6">
+    				<div class="panel">
+    						<div class="panel-heading ">
+    						</div>
+    						<div class="panel-body">
+    						<div style="float: left;">count:{{notification.count}},Read:{{notification.read}}
+					       Message : {{messageObj}}
+							</div>
+							<notification-icon count='notification.count-notification.read' ng-click="updateReadNotificationCount()" outside-click="closeNotificationList()">
+  								<i class="fa fa-envelope-o fa-3x"></i>
+							</notification-icon>
+							<div style="max-height:250px;width:300px;overflow-y:auto;">
+							<!-- <li ng-repeat="i in notification.list track by $index" ng-style="$index < (notification.count-notification.read) && {'background': 'yellow'}" ng-if="showList" >{{i}}</li> -->
+							<table class="table table-bordered table-hover" >
+    
+    						<tbody ng-if="showList">
+							      <tr ng-repeat="activity in notification.list track by $index"  ng-class="$index < (notification.count-notification.read)?'unread':''">
+							      <!-- ng-class = "{'active' : pageType == 'reviewOnly' && currentPage == 'ARCHIVED'}" -->
+							        <td ><img ng-src="/images/{{activity.img_url}}" style="border: 1px solid gray;height: 40px;
+    width: 35px;"></td><td><strong>{{activity.name}}</strong><br /><span>{{activity.type}}</span></td>
+							      </tr>
+							</tbody>
+							</table>
+							</div>
+    						</div>
+    				</div>
+    		</div>
+    	</div>
+    </div>
+   </div>

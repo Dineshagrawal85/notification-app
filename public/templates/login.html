@@ -1,0 +1,11 @@
+<h2>login</h2>
+ 
+{{ message }}
+<a href="http://localhost:3000/#/home">Click here to go to dashboard</a>
+<form >
+Name:<input type="text" ng-model="user.user" placeholder="enter your name here">
+Password:<input type="password" ng-model="user.password" placeholder="enter your password here">
+<input type="submit" ng-click="submit()">
+</form>
+{{errorMessage}}
+<a href="http://localhost:3000/#/signup">New user Sign up</a>
