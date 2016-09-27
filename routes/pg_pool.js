@@ -10,14 +10,14 @@ var genericpool = require("generic-pool");
     "dialect": "postgres" 
 }*/
 
-var database_conf = {
+/*var database_conf = {
   "host":"ec2-54-75-228-83.eu-west-1.compute.amazonaws.com",
     "username":"maqtincwtssiww",
     "password":"abZsu5kPquqSuwFXzx-AEDQ9uR",
     "db":"dcddpalkomp2tc",
     "port": 5432,
     "dialect": "postgres" 
-}
+}*/
 
 
 /*ec2-54-75-228-83.eu-west-1.compute.amazonaws.com
