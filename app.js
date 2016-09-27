@@ -123,7 +123,7 @@ var sendToAll = function(socketId){
     socketList[notificationSocketList[i]].emit('msg',{'message':'sent',"count":notification[notificationSocketList[i]]["count"],"notification":array[index],"read":notification[notificationSocketList[i]]["read"]})
   }
 }
-var io=require('socket.io').listen(app.listen(3000));
+var io=require('socket.io').listen(app.listen(50162));
 require('./socket/io_operations')(io);
 socketClients.io = io;
 
