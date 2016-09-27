@@ -36,7 +36,7 @@ sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore
     $cookieStore.put('user_info',undefined)
     $scope.submit=function()
       {
-        $http.post('/login', $scope.user)
+        /*$http.post('/login', $scope.user)
         .success(function(data) {
             //$scope.form1 = {};
             //$state.go('state1');
@@ -58,8 +58,8 @@ sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore
           //$state.go('state1');
             //console.log('Error: ' + error);
             $scope.errorMessage = "Internal Server Error. Please try after some time"
-        });
-        /*if($scope.user.name == "samar"){
+        });*/
+        if($scope.user.name == "samar"){
             user_id = 1
             img_url = "image6.jpg"
         }else if ($scope.user.name == "ravindra"){
@@ -71,7 +71,7 @@ sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore
         }
         var user_info = {"user_name":$scope.user.name,"user_id":user_id,"img_url":img_url}
         $cookieStore.put('user_info',user_info)
-        $state.go('state1',{"user_name":$scope.user.name});*/
+        $state.go('state1',{"user_name":$scope.user.name});
   }
       
 });
