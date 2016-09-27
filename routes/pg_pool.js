@@ -19,11 +19,13 @@ var database_conf = {
     "dialect": "postgres" 
 }
 
+
 /*ec2-54-75-228-83.eu-west-1.compute.amazonaws.com
 db - dcddpalkomp2tc
 user - maqtincwtssiww
 password - abZsu5kPquqSuwFXzx-AEDQ9uR*/
-var connectionString = 'postgres://'+database_conf.username+':'+database_conf.password+'@'+database_conf.host+'/'+database_conf.db;
+//var connectionString = 'postgres://'+database_conf.username+':'+database_conf.password+'@'+database_conf.host+'/'+database_conf.db;
+var connectionString  = 'postgres://garkljwsizcqmu:mQOfygl0RuJSw2mvFcEzq_GHZn@ec2-54-235-87-70.compute-1.amazonaws.com:5432/ddr371q6rrcpk9'
 
 
 
