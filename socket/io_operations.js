@@ -5,6 +5,8 @@ privateChatSessions = socketClients.privateChatSessions
 var notification = require('../notificationhistory').notification
 var utility = require('../routes/utility.js')
 var array = require('./../array')
+var logger = require('./../logger/log');
+
 module.exports = function(io){
 io.sockets.on('connection', function (socket) {
   console.log(":connection")
@@ -37,24 +39,32 @@ io.sockets.on('connection', function (socket) {
       //socketObj[socket.id] = socket
       //var indexSocketId = socketArr.indexOf(socket.id)
       //socketArr = socketArr.splice(indexSocketId,1)
-      var user_id = socketObjDetail[socket.id]["user_info"].user_id
-      //This is called to delete it's entry from active sessionsObject
-      delete socketObjDetail[socket.id]
+      try{
+        var user_id = socketObjDetail[socket.id]["user_info"].user_id
+        //This is called to delete it's entry from active sessionsObject
+        delete socketObjDetail[socket.id]
 
-      //This is true when then user which disconnected is doing Private Chat With other user
-      //Reason Code 0 - User Disconnected
-      if (privateChatSessions[user_id] != undefined){
-          for(key in socketObjDetail){
-          var userId = socketObjDetail[key].user_info.user_id
-          if(userId == privateChatSessions[user_id]){
-            //Delete the Disconnected user entry from private Chat Session Object
-            //To Make the status Available of the destination user
-            delete privateChatSessions[privateChatSessions[user_id]]
-            delete privateChatSessions[user_id]
-            io.sockets.connected[key].emit('private-chat-session-over',{"code":0})
-          }
+        //This is true when then user which disconnected is doing Private Chat With other user
+        //Reason Code 0 - User Disconnected
+        if (privateChatSessions[user_id] != undefined){
+            for(key in socketObjDetail){
+                var userId = socketObjDetail[key].user_info.user_id
+                if(userId == privateChatSessions[user_id]){
+                    //Delete the Disconnected user entry from private Chat Session Object
+                    //To Make the status Available of the destination user
+                    delete privateChatSessions[privateChatSessions[user_id]]
+                    delete privateChatSessions[user_id]
+                    io.sockets.connected[key].emit('private-chat-session-over',{"code":0})
+                }
+            }
         }
       }
+
+      catch(e){
+        console.log(":Exception Occured",e)
+        logger.log("error","Error in disconnect handler "+e)
+      }
+      
     });
 
 

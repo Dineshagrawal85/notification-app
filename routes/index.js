@@ -6,6 +6,7 @@ var router = express.Router();
 var socketObjDetail = require('../socketClients').socketObjDetail
 var notification = require('../notificationhistory').notification
 var pool = require('./pg_pool.js')
+var logger = require('./../logger/log');
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.sendFile('/home/Dinesh/work/socket/views/page1.html');
@@ -31,6 +32,8 @@ router.post('/update/all',function(req,res,next){
   pool.acquire(function(err,connection){
       if(err){
         console.log(":err",err)
+        logger.log("error","Error connection to database "+err)
+        return res.json({"statusCode":0})
       }
       else{
           var query = "update user_detail set last_read_timestamp = now()::timestamp with time zone where id = " +  userId
@@ -38,10 +41,12 @@ router.post('/update/all',function(req,res,next){
           connection.query(query, function(err, rows) {
             if (err){
               console.log(":err",err)
+              logger.log("error","Error Executing query "+query+ " \nError "+err)
+              return res.json({"statusCode":0}) 
             }
             else{
               notification[clientId]["read"] = notification[clientId]["count"]
-              res.send({"read":notification[clientId]["read"]})
+              return res.send({"statusCode":1,read:notification[clientId]["read"]})
             }
           });
       } 
@@ -69,12 +74,14 @@ var getSecurePassword=function(passwordToHash,cb) {
 var saveUserDetails = function(user_name,img_url,hashCreated,saltToString, cb){
   pool.acquire(function(err,connection){
       if(err){
+        logger.log("error","Error connection to database "+err)
         cb(err)
       }
       else{
           var query = "select * from public.save_user_details('"+user_name+"','"+img_url+"','"+hashCreated+"','"+saltToString+"')"
           connection.query(query, function(err, rows) {
             if (err){
+              logger.log("error","Error Executing query "+query+ " \nError "+err)
               cb(err)
             }
             else{
@@ -93,12 +100,14 @@ var saveUserDetails = function(user_name,img_url,hashCreated,saltToString, cb){
 var saveUserAssociation = function(userId,cb){
   pool.acquire(function(err,connection){
       if(err){
+        logger.log("error","Error connection to database "+err)
         cb(err)
       }
       else{
           var query = "insert into user_association (source_user,associated_user) values("+userId+",'{1,2,4,5}')"
           connection.query(query, function(err, rows) {
             if (err){
+              logger.log("error","Error Executing query "+query+ " \nError "+err)
               cb(err)
             }
             else{
@@ -113,12 +122,14 @@ var saveUserAssociation = function(userId,cb){
 var saveUserSubscriptionMap = function(user_id,subsciptionArray,cb){
   pool.acquire(function(err,connection){
       if(err){
+        logger.log("error","Error connection to database "+err)
         cb(err)
       }
       else{
           var query = "select * from public.post_user_subscriptions('["+subsciptionArray+"]',"+user_id+")"
           connection.query(query, function(err, rows) {
             if (err){
+              logger.log("error","Error Executing query "+query+ " \nError "+err)
               cb(err)
             }
             else{
@@ -135,12 +146,14 @@ router.post('/login',function(req,res,next){
   var password = req.body.password
   pool.acquire(function(err,connection){
       if(err){
-        res.json({"statusCode":0})
+        logger.log("error","Error connection to database "+err)
+        return res.json({"statusCode":0})
       }
       else{
           var query = "select * from public.get_user_login_details('"+user_name+"')"
           connection.query(query, function(err, rows) {
             if (err){
+              logger.log("error","Error Executing query "+query+ " \nError "+err)
               res.json({"statusCode":0})
             }
             else{

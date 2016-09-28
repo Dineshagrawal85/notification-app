@@ -2,11 +2,13 @@ var array = require('./../array.js')
 var notification = require('../notificationhistory').notification
 var socketObjDetail = require('../socketClients').socketObjDetail
 var pool = require('./pg_pool.js')
+var logger = require('./../logger/log');
 //var io = require('../socketClients').io
 exports.getNotificationFromDB = function(userId,key,cb){
   pool.acquire(function(err,connection){
       if(err){
         console.log(":err",err)
+        logger.log("error","Error connection to database "+err)
         //res.json({statusCode: 0, message: err.code});
       }
       else{
@@ -15,6 +17,8 @@ exports.getNotificationFromDB = function(userId,key,cb){
           connection.query(query, function(err, rows) {
             if (err){
               console.log(":err",err)
+              logger.log("error","Error Executing query "+query+ " \nError "+err)
+              cb(err)
             }
             else{
             //console.log(":rows",rows.rows[0])   
@@ -54,6 +58,7 @@ var startNotification = function(){
     pool.acquire(function(err,connection){
       if(err){
         console.log(":err",err)
+        logger.log("error","Error connection to database "+err)
       }
       else{
           var query = "SELECT * FROM  insert_notification("+newNotification.id+","+newNotification.type+")"
@@ -61,6 +66,7 @@ var startNotification = function(){
           connection.query(query, function(err, rows) {
             if (err){
               console.log(":err",err)
+              logger.log("error","Error Executing query "+query+ " \nError "+err)
             }
             else{
               fetchNewNotification(newNotification.id)
@@ -79,6 +85,7 @@ var fetchNewNotification = function(senderId){
   pool.acquire(function(err,connection){
       if(err){
         console.log(":err",err)
+        logger.log("error","Error connection to database "+err)
       }
       else{
           var query = "select receiver from user_subscription_map where sender = " + senderId
@@ -86,6 +93,7 @@ var fetchNewNotification = function(senderId){
           connection.query(query, function(err, rows) {
             if (err){
               console.log(":err",err)
+              logger.log("error","Error Executing query "+query+ " \nError "+err)
             }
             else{
             //console.log(":rows",rows.rows[0])   
@@ -120,6 +128,7 @@ var checkAllNotificationInDB = function(userId,key,maxNotificationId){
   pool.acquire(function(err,connection){
         if(err){
           console.log(":err",err)
+          logger.log("error","Error connection to database "+err)
         }
         else{
           var query = "SELECT * FROM  get_new_notification("+userId+","+maxNotificationId+")"
@@ -127,6 +136,7 @@ var checkAllNotificationInDB = function(userId,key,maxNotificationId){
           connection.query(query, function(err, rows) {
             if (err){
               console.log(":err",err)
+              logger.log("error","Error Executing query "+query+ " \nError "+err)
             }
             else{
               var notificationDataForUnRead = rows.rows[0].unreadmessage;
