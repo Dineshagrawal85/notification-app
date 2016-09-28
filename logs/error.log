@@ -1,0 +1,6 @@
+[2016-09-28 21:25:49.132] [INFO] error - This is Error Logger
+[2016-09-28 21:25:53.157] [INFO] error - 
+
+Error in disconnect handler TypeError: Cannot read property 'user_info' of undefined
+
+-----------------------------------------------------
