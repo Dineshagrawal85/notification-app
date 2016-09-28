@@ -170,6 +170,6 @@ io.sockets.on('connection', function (socket) {
       })
       console.log(":activeSocketsObj",activeSocketsObj)
       io.emit('socket-list', activeSocketsObj);
-    },5000)
+    },1000*30)
 });
 }
