@@ -184,16 +184,22 @@ router.post('/signup',function(req,res,next){
   getSecurePassword(password,function(hashCreated,saltToString){
     saveUserDetails(user_name,img_url,hashCreated,saltToString,function(err,user_id){
       if(err){
+        logger.log("error","saveUserDetails error"+err)
         return res.json({"statusCode":0})
       }
+      logger.log("info","saveUserDetails success")
       saveUserAssociation(user_id.id,function(err){
         if(err){
+          logger.log("error","saveUserAssociation error"+err)
           return res.json({"statusCode":0})
         }
+        logger.log("info","saveUserAssociation success")
         saveUserSubscriptionMap(user_id.id,[1,2,4,5],function(err){
           if(err){
+            logger.log("error","saveUserSubscriptionMap error"+err)
             return res.json({"statusCode":0})
           }
+          logger.log("info","saveUserSubscriptionMap success")
           var user_detail = {"user_id":user_id.id,"user_name":user_name,"img_url":img_url}
           res.json({"statusCode":1,"user_detail":user_detail})
         })
