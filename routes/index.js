@@ -7,6 +7,7 @@ var socketObjDetail = require('../socketClients').socketObjDetail
 var notification = require('../notificationhistory').notification
 var pool = require('./pg_pool.js')
 var logger = require('./../logger/log');
+var multer = require('multer');
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.sendFile('/home/Dinesh/work/socket/views/page1.html');
@@ -176,11 +177,41 @@ router.post('/login',function(req,res,next){
   })
 })
 
+var storage =   multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, './public/images');
+  },
+  filename: function (req, file, callback) {
+    callback(null, file.fieldname + '-' + Date.now()+'-'+file.originalname);
+  }
+});
 
+var upload = multer({ storage : storage}).single('file');
 router.post('/signup',function(req,res,next){
-  var user_name = req.body.user;
-  var password = req.body.password
   var img_url = ""
+  upload(req,res,function(err) {
+        console.log(">>>>>>>2",req.file);
+        if(err) {
+            
+            console.log("File uploading error");
+            return res.end("Error uploading file.");
+        }else{
+          console.log(":not error")
+          var user_name = req.body.user;
+          var password = req.body.password
+          var img_url = 'images/'+req.file.filename
+          console.log("user_name",user_name)
+          console.log(":password",password)
+          console.log("img_url",img_url)
+          /*{ fieldname: 'file',
+  originalname: '5.png',
+  encoding: '7bit',
+  mimetype: 'image/png',
+  destination: './public/images',
+  filename: 'file-1475084697505',
+  path: 'public/images/file-1475084697505',
+  size: 120521 }*/
+       
   getSecurePassword(password,function(hashCreated,saltToString){
     saveUserDetails(user_name,img_url,hashCreated,saltToString,function(err,user_id){
       if(err){
@@ -188,24 +219,27 @@ router.post('/signup',function(req,res,next){
         return res.json({"statusCode":0})
       }
       logger.log("info","saveUserDetails success")
-      saveUserAssociation(user_id.id,function(err){
+      console.log("user_id",user_id)
+      saveUserAssociation(user_id.save_user_details,function(err){
         if(err){
           logger.log("error","saveUserAssociation error"+err)
           return res.json({"statusCode":0})
         }
         logger.log("info","saveUserAssociation success")
-        saveUserSubscriptionMap(user_id.id,[1,2,4,5],function(err){
+        saveUserSubscriptionMap(user_id.save_user_details,[1,2,4,5],function(err){
           if(err){
             logger.log("error","saveUserSubscriptionMap error"+err)
             return res.json({"statusCode":0})
           }
           logger.log("info","saveUserSubscriptionMap success")
-          var user_detail = {"user_id":user_id.id,"user_name":user_name,"img_url":img_url}
+          var user_detail = {"user_id":user_id.save_user_details,"user_name":user_name,"img_url":img_url}
           res.json({"statusCode":1,"user_detail":user_detail})
         })
       })
     })
   })
+   }
+})
 })
 
 

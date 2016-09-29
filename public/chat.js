@@ -22,6 +22,11 @@ sampleApp.config(function($stateProvider, $urlRouterProvider) {
       templateUrl: "templates/login.html",
       controller: 'logincontroller'
     })
+    .state('signup', {
+      url: "/signup",
+      templateUrl: "templates/signup.html",
+      controller: 'signupController'
+    })
 });
 
 sampleApp.controller('mainCtrl',function($scope, $http,localStorageService){
@@ -36,7 +41,7 @@ sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore
     $cookieStore.put('user_info',undefined)
     $scope.submit=function()
       {
-        /*$http.post('/login', $scope.user)
+        $http.post('/login', $scope.user)
         .success(function(data) {
             //$scope.form1 = {};
             //$state.go('state1');
@@ -58,8 +63,8 @@ sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore
           //$state.go('state1');
             //console.log('Error: ' + error);
             $scope.errorMessage = "Internal Server Error. Please try after some time"
-        });*/
-        if($scope.user.user == "samar"){
+        });
+        /*if($scope.user.user == "samar"){
             user_id = 1
             img_url = "image6.jpg"
         }else if ($scope.user.user == "ravindra"){
@@ -71,10 +76,34 @@ sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore
         }
         var user_info = {"user_name":$scope.user.user,"user_id":user_id,"img_url":img_url}
         $cookieStore.put('user_info',user_info)
-        $state.go('state1',{"user_name":$scope.user.user});
+        $state.go('state1',{"user_name":$scope.user.user});*/
   }
       
 });
+
+sampleApp.controller('signupController',function($scope, $http,localStorageService){
+    console.log("signupcontroller")
+    $scope.registerUser = function(){
+        console.log("$scope.user",$scope.user)
+        var fd = new FormData();
+        fd.append('file', $scope.myfile);
+        fd.append("user",$scope.user.username)
+        fd.append("password",$scope.user.password)
+        //console.log(fd);
+        $http.post('signup', fd ,{
+            transformRequest: angular.identity,
+            headers: {'Content-Type': undefined}
+        })
+        .success(function(data){
+          console.log("Success call");
+        })
+        .error(function(err){
+            console.log(":err",err)
+        });
+    }
+})
+
+
 sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieStore,$compile){
 //window.onload = function() {
     console.log(":called")
@@ -386,4 +415,21 @@ sampleApp.directive("outsideClick", ['$document','$parse', function( $document, 
             });
         }
     }
+}]);
+
+
+sampleApp.directive('fileModel', ['$parse', function ($parse) {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            var model = $parse(attrs.fileModel);
+            var modelSetter = model.assign;
+            
+            element.bind('change', function(){
+                scope.$apply(function(){
+                    modelSetter(scope, element[0].files[0]);
+                });
+            });
+        }
+    };
 }]);
