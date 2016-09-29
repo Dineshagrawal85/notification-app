@@ -78,6 +78,10 @@ sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore
         $cookieStore.put('user_info',user_info)
         $state.go('state1',{"user_name":$scope.user.user});*/
   }
+
+  $scope.redirectToSignUp = function(){
+    $state.go('signup')
+  }
       
 });
 

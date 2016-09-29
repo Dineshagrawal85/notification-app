@@ -37,9 +37,9 @@ Password:<input type="password" ng-model="user.password" placeholder="enter your
 										<button type="submit"  id="submitbtn" class="btn btn-lg btn-danger" tabIndex="3" ng-click="submit()">Login</button>
 									</div>
 								</form>
-								<!-- <div class="login-helpers">
-									<a class = "pointerclass" title="Forgot Password" onClick={this.swapForgotPassword}>Forgot Password?</a>
-								</div> -->
+								<div class="login-helpers">
+									<a class = "pointerclass" ng-click="redirectToSignUp()">Sign Up?</a>
+								</div>
 							</div>
 						</div>
 					</div>
