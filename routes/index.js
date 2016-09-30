@@ -28,8 +28,14 @@ router.get('/demo/set',function(req,res,next){
 })*/
 
 router.post('/update/all',function(req,res,next){
-  var clientId = req.body.clientId;
-  var userId = socketObjDetail[clientId].user_info.user_id
+  try{
+    var clientId = req.body.clientId;
+    var userId = socketObjDetail[clientId].user_info.user_id
+  }
+  catch(e){
+    logger.log("error","Exception Occured in /update/all "+e)
+    return res.json({"statusCode":0})
+  }
   pool.acquire(function(err,connection){
       if(err){
         console.log(":err",err)

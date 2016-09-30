@@ -3,13 +3,13 @@ var sampleApp = angular.module('sampleapp',  ['angular-notification-icons','angu
 
 sampleApp.config(function($stateProvider, $urlRouterProvider) {
     //
-  // For any unmatched url, redirect to /state1
+  // For any unmatched url, redirect to /login
   $urlRouterProvider.otherwise("/login");
   //
   // Now set up the states 
 
   $stateProvider
-    .state('state1', {
+    .state('home', {
       url: "/home",
       params:{
         "user_name": null
@@ -17,10 +17,13 @@ sampleApp.config(function($stateProvider, $urlRouterProvider) {
       templateUrl: "templates/home.html",
       controller: 'samplecontroller'
     })
-    .state('state2', {
+    .state('login', {
       url: "/login",
       templateUrl: "templates/login.html",
-      controller: 'logincontroller'
+      controller: 'logincontroller',
+      params:{
+        "redirectMessage":null
+      }
     })
     .state('signup', {
       url: "/signup",
@@ -34,23 +37,31 @@ sampleApp.controller('mainCtrl',function($scope, $http,localStorageService){
     console.log(":localStorageService",localStorageService.get("key"))
 
 })
-sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore){
+sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore,$stateParams){
   
     $scope.message =  "login";
     $scope.errorMessage = ""
+    $scope.redirectMessage = ""
+    $scope.user = {user:'',password:''}
     $cookieStore.put('user_info',undefined)
+    if ($stateParams.redirectMessage != null){
+        $scope.redirectMessage = $stateParams.redirectMessage
+    }
+
     $scope.submit=function()
       {
+        if($scope.user.user == '' || $scope.user.password ==''){
+            $scope.errorMessage = 'User Name or Password can\'t be empty'
+            return
+        }
         $http.post('/login', $scope.user)
         .success(function(data) {
-            //$scope.form1 = {};
-            //$state.go('state1');
             console.log(":data",data)
             if(data.statusCode ==1){
                 if(data.loggedIn){
                     var user_info = data.userDetail
                     $cookieStore.put('user_info',user_info)
-                    $state.go('state1',{"user_name":$scope.user.name});
+                    $state.go('home',{"user_name":$scope.user.name});
                 }else{
                     $scope.errorMessage = data.Message
                 }
@@ -60,7 +71,7 @@ sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore
             }
         })
         .error(function(error) {
-          //$state.go('state1');
+          //$state.go('login');
             //console.log('Error: ' + error);
             $scope.errorMessage = "Internal Server Error. Please try after some time"
         });
@@ -76,7 +87,7 @@ sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore
         }
         var user_info = {"user_name":$scope.user.user,"user_id":user_id,"img_url":img_url}
         $cookieStore.put('user_info',user_info)
-        $state.go('state1',{"user_name":$scope.user.user});*/
+        $state.go('login',{"user_name":$scope.user.user});*/
   }
 
   $scope.redirectToSignUp = function(){
@@ -85,11 +96,26 @@ sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore
       
 });
 
-sampleApp.controller('signupController',function($scope, $http,localStorageService){
+sampleApp.controller('signupController',function($scope, $http,localStorageService,$state){
     console.log("signupcontroller")
+    $scope.errorMessage = ""
+    $scope.user = {"username":'',"password":""}
     $scope.registerUser = function(){
-        console.log("$scope.user",$scope.user)
+        if($scope.user.username == ''){
+            $scope.errorMessage = "User Name cannot be left empty"
+            return
+        }
+        if($scope.user.password == ''){
+            $scope.errorMessage = "Password cannot be left empty"
+            return
+        }
+
+        if($scope.myfile == undefined){
+            $scope.errorMessage = "Please upload an image"
+            return
+        }
         var fd = new FormData();
+
         fd.append('file', $scope.myfile);
         fd.append("user",$scope.user.username)
         fd.append("password",$scope.user.password)
@@ -99,10 +125,12 @@ sampleApp.controller('signupController',function($scope, $http,localStorageServi
             headers: {'Content-Type': undefined}
         })
         .success(function(data){
-          console.log("Success call");
+          $state.go('login',{redirectMessage:'SignUp Success. Please continue with login'})
         })
+
         .error(function(err){
             console.log(":err",err)
+            $scope.errorMessage = "SignUp fail please try after some time"
         });
     }
 })
@@ -331,6 +359,10 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
         console.log(":called updateReadNotification")
         $http.post('/update/all', {"clientId":$scope.clientId})
         .success(function(data) {
+            if(data.statusCode == 0){
+                console.log("Error Updating Information, Please try again later")
+                return
+            }
             //$scope.form1 = {};
             //$scope.$parent.email=data;
             //$cookieStore.put('name',data.name);
@@ -341,6 +373,7 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
         })
         .error(function(error) {
             console.log('Error: ' + error);
+            console.log("Error Updating Information, Please try again later")
         });
     }
 
