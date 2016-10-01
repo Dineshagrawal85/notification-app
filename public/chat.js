@@ -312,6 +312,10 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
             terminatePrivateChatSession()
         }
     })
+
+    socket.on('public-message',function(messageReceived){
+        console.log(":messageReceived",messageReceived)
+    })
     //Invoke when a Destination user accepts the request for a Private chat Session
     //destinationUserDetails is a JSON Object which contains information about destination user
     var startPrivateChatSession = function(destinationUserInfo){

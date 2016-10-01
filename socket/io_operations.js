@@ -174,16 +174,21 @@ io.sockets.on('connection', function (socket) {
 
     //This is set to send the available users list to the active clients in a interval
     setInterval(function(){
-      var activeSockets = Object.keys(io.sockets.connected)
-      var activeSocketsObj = {}
-      activeSockets.map(function(sockObj){
-       //return socketObjDetail[sockObj]["user_info"]
-       var currentUserDetail = socketObjDetail[sockObj]["user_info"]
-       activeSocketsObj[currentUserDetail["user_id"]] = socketObjDetail[sockObj]["user_info"]
-       activeSocketsObj[currentUserDetail["user_id"]]["status"] = (privateChatSessions[currentUserDetail["user_id"]] == undefined)?"Available":"Busy";
-      })
-      console.log(":activeSocketsObj",activeSocketsObj)
-      io.emit('socket-list', activeSocketsObj);
-    },1000*20)
+      try{
+        var activeSockets = Object.keys(io.sockets.connected)
+        var activeSocketsObj = {}
+        activeSockets.map(function(sockObj){
+         //return socketObjDetail[sockObj]["user_info"]
+         var currentUserDetail = socketObjDetail[sockObj]["user_info"]
+         activeSocketsObj[currentUserDetail["user_id"]] = socketObjDetail[sockObj]["user_info"]
+         activeSocketsObj[currentUserDetail["user_id"]]["status"] = (privateChatSessions[currentUserDetail["user_id"]] == undefined)?"Available":"Busy";
+        })
+        console.log(":activeSocketsObj",activeSocketsObj)
+        io.emit('socket-list', activeSocketsObj);
+      }
+      catch(e){
+        console.log(":exception occured",e)
+      }
+    },1000*20*1000)
 });
 }

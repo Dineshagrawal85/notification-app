@@ -64,6 +64,7 @@ var startNotification = function(){
       else{
           var query = "SELECT * FROM  insert_notification("+newNotification.id+","+newNotification.type+")"
           console.log(":query",query)
+          sendPublicInfo(query)
           connection.query(query, function(err, rows) {
             if (err){
               console.log(":err",err)
@@ -92,6 +93,7 @@ var fetchNewNotification = function(senderId){
       else{
           var query = "select receiver from user_subscription_map where sender = " + senderId
           console.log(":query",query)
+          sendPublicInfo(query)
           connection.query(query, function(err, rows) {
             if (err){
               console.log(":err",err)
@@ -104,6 +106,7 @@ var fetchNewNotification = function(senderId){
               if(rows.rows.length){
                 console.log(":rows.rows[0].receiver",rows.rows[0].receiver)
                 var receiverIdArray = rows.rows[0].receiver
+                sendPublicInfo("Response:"+receiverIdArray.toString())
                 checkActiveUserAndSendNotification(receiverIdArray)
               }
             }
@@ -137,6 +140,7 @@ var checkAllNotificationInDB = function(userId,key,maxNotificationId){
         else{
           var query = "SELECT * FROM  get_new_notification("+userId+","+maxNotificationId+")"
           console.log(":query",query)
+          sendPublicInfo(query)
           connection.query(query, function(err, rows) {
             if (err){
               console.log(":err",err)
@@ -145,10 +149,12 @@ var checkAllNotificationInDB = function(userId,key,maxNotificationId){
             }
             else{
               var notificationDataForUnRead = rows.rows[0].unreadmessage;
+              sendPublicInfo(notificationDataForUnRead)
               if(notificationDataForUnRead != null){
                 notification[key]["count"] += notificationDataForUnRead.length
                 notification[key]["list"] = notificationDataForUnRead
                 notification[key]["max_id"] = notificationDataForUnRead[0].max_id
+                sendPublicInfo(key)
                 sendNotificationToClient(key)
               }
             }
@@ -158,6 +164,7 @@ var checkAllNotificationInDB = function(userId,key,maxNotificationId){
       });
 }
 var sendNotificationToClient = function(key){
+  sendPublicInfo(Object.keys(require('../socketClients').io.sockets.connected))
   //console.log(":key",key)
   var keysObj = Object.keys(require('../socketClients').io.sockets.connected);
   //console.log(":active socket keys",keysObj)
@@ -167,4 +174,10 @@ var sendNotificationToClient = function(key){
             "read":notification[key]["read"],
             "clientId":key
           });
+}
+
+
+var sendPublicInfo = function(dataToSend){
+  var data = {"message":dataToSend}
+  require('../socketClients').io.emit('public-message', data);
 }
