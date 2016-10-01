@@ -62,19 +62,26 @@ router.post('/update/all',function(req,res,next){
 })
 
 var getSecurePassword=function(passwordToHash,cb) { 
-   
-  var salt = secureRandom.randomBuffer(4);  
-  var saltToString = salt.toString('hex');
-  var bytes = [];
-  var str = passwordToHash;
-  for (var i = 0; i < str.length; ++i) {
-      bytes.push(str.charCodeAt(i));
-  } 
-  var hash = crypto.createHash('md5');      
-    hash.update(saltToString);      
-    hash.update(str);
-  var hashCreated = hash.digest(bytes).toString('hex');   
-  cb(hashCreated,saltToString);   
+
+  try{
+      var salt = secureRandom.randomBuffer(4);  
+      var saltToString = salt.toString('hex');
+      var bytes = [];
+      var str = passwordToHash;
+      for (var i = 0; i < str.length; ++i) {
+          bytes.push(str.charCodeAt(i));
+      } 
+      var hash = crypto.createHash('md5');      
+      hash.update(saltToString);      
+      hash.update(str);
+      var hashCreated = hash.digest(bytes).toString('hex');   
+      cb(null,hashCreated,saltToString);   
+  }
+  catch(e){
+      logger.log("error","Exception Occured in Generating hash for password "+e)
+      cb(e)
+  }
+  
 }
 
 
@@ -86,6 +93,7 @@ var saveUserDetails = function(user_name,img_url,hashCreated,saltToString, cb){
       }
       else{
           var query = "select * from public.save_user_details('"+user_name+"','"+img_url+"','"+hashCreated+"','"+saltToString+"')"
+          console.log(":query",query)
           connection.query(query, function(err, rows) {
             if (err){
               logger.log("error","Error Executing query "+query+ " \nError "+err)
@@ -112,6 +120,7 @@ var saveUserAssociation = function(userId,cb){
       }
       else{
           var query = "insert into user_association (source_user,associated_user) values("+userId+",'{1,2,4,5}')"
+          console.log(":query",query)
           connection.query(query, function(err, rows) {
             if (err){
               logger.log("error","Error Executing query "+query+ " \nError "+err)
@@ -134,6 +143,7 @@ var saveUserSubscriptionMap = function(user_id,subsciptionArray,cb){
       }
       else{
           var query = "select * from public.post_user_subscriptions('["+subsciptionArray+"]',"+user_id+")"
+          console.log(":query",query)
           connection.query(query, function(err, rows) {
             if (err){
               logger.log("error","Error Executing query "+query+ " \nError "+err)
@@ -198,54 +208,44 @@ router.post('/signup',function(req,res,next){
   upload(req,res,function(err) {
         console.log(">>>>>>>2",req.file);
         if(err) {
-            
             console.log("File uploading error");
+            logger.log("error","File uploading error"+err)
             return res.end("Error uploading file.");
         }else{
-          console.log(":not error")
           var user_name = req.body.user;
           var password = req.body.password
           var img_url = 'images/'+req.file.filename
-          console.log("user_name",user_name)
-          console.log(":password",password)
-          console.log("img_url",img_url)
-          /*{ fieldname: 'file',
-  originalname: '5.png',
-  encoding: '7bit',
-  mimetype: 'image/png',
-  destination: './public/images',
-  filename: 'file-1475084697505',
-  path: 'public/images/file-1475084697505',
-  size: 120521 }*/
-       
-  getSecurePassword(password,function(hashCreated,saltToString){
-    saveUserDetails(user_name,img_url,hashCreated,saltToString,function(err,user_id){
-      if(err){
-        logger.log("error","saveUserDetails error"+err)
-        return res.json({"statusCode":0})
-      }
-      logger.log("info","saveUserDetails success")
-      console.log("user_id",user_id)
-      saveUserAssociation(user_id.save_user_details,function(err){
-        if(err){
-          logger.log("error","saveUserAssociation error"+err)
-          return res.json({"statusCode":0})
+          getSecurePassword(password,function(err,hashCreated,saltToString){
+            if(err){
+              return res.json({"statusCode":0})
+            }
+                saveUserDetails(user_name,img_url,hashCreated,saltToString,function(err,user_id){
+                  if(err){
+                    logger.log("error","saveUserDetails error"+err)
+                    return res.json({"statusCode":0})
+                  }
+                  logger.log("info","saveUserDetails success")
+                  console.log("user_id",user_id)
+                  saveUserAssociation(user_id.save_user_details,function(err){
+                    if(err){
+                      logger.log("error","saveUserAssociation error"+err)
+                      return res.json({"statusCode":0})
+                    }
+                    logger.log("info","saveUserAssociation success")
+                    saveUserSubscriptionMap(user_id.save_user_details,[1,2,4,5],function(err){
+                      if(err){
+                        logger.log("error","saveUserSubscriptionMap error"+err)
+                        return res.json({"statusCode":0})
+                      }
+                      logger.log("info","saveUserSubscriptionMap success")
+                      var user_detail = {"user_id":user_id.save_user_details,"user_name":user_name,"img_url":img_url}
+                      res.json({"statusCode":1,"user_detail":user_detail})
+                    })
+                  })
+                })
+          })
         }
-        logger.log("info","saveUserAssociation success")
-        saveUserSubscriptionMap(user_id.save_user_details,[1,2,4,5],function(err){
-          if(err){
-            logger.log("error","saveUserSubscriptionMap error"+err)
-            return res.json({"statusCode":0})
-          }
-          logger.log("info","saveUserSubscriptionMap success")
-          var user_detail = {"user_id":user_id.save_user_details,"user_name":user_name,"img_url":img_url}
-          res.json({"statusCode":1,"user_detail":user_detail})
-        })
-      })
-    })
   })
-   }
-})
 })
 
 

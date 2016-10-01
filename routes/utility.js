@@ -9,6 +9,7 @@ exports.getNotificationFromDB = function(userId,key,cb){
       if(err){
         console.log(":err",err)
         logger.log("error","Error connection to database "+err)
+        cb(err)
         //res.json({statusCode: 0, message: err.code});
       }
       else{
@@ -53,7 +54,7 @@ exports.getNotificationFromDB = function(userId,key,cb){
 
 var startNotification = function(){
   setInterval(function(){
-    var index = Math.floor((Math.random() * 10));
+    var index = Math.floor((Math.random() * 39));
     var newNotification = array[index]
     pool.acquire(function(err,connection){
       if(err){
@@ -86,6 +87,7 @@ var fetchNewNotification = function(senderId){
       if(err){
         console.log(":err",err)
         logger.log("error","Error connection to database "+err)
+        return
       }
       else{
           var query = "select receiver from user_subscription_map where sender = " + senderId
@@ -94,6 +96,7 @@ var fetchNewNotification = function(senderId){
             if (err){
               console.log(":err",err)
               logger.log("error","Error Executing query "+query+ " \nError "+err)
+              return
             }
             else{
             //console.log(":rows",rows.rows[0])   
@@ -129,6 +132,7 @@ var checkAllNotificationInDB = function(userId,key,maxNotificationId){
         if(err){
           console.log(":err",err)
           logger.log("error","Error connection to database "+err)
+          return
         }
         else{
           var query = "SELECT * FROM  get_new_notification("+userId+","+maxNotificationId+")"
@@ -137,6 +141,7 @@ var checkAllNotificationInDB = function(userId,key,maxNotificationId){
             if (err){
               console.log(":err",err)
               logger.log("error","Error Executing query "+query+ " \nError "+err)
+              return
             }
             else{
               var notificationDataForUnRead = rows.rows[0].unreadmessage;

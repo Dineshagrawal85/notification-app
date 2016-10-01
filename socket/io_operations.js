@@ -73,7 +73,11 @@ io.sockets.on('connection', function (socket) {
     socket.on('info',function(data){
       //console.log(":data",data)
       socketObjDetail[socket.id] = data
-      utility.getNotificationFromDB(data.user_info.user_id,socket.id,function(){
+      utility.getNotificationFromDB(data.user_info.user_id,socket.id,function(err){
+
+        if(err){
+          return
+        }
         socket.emit('message',
           { message: 'welcome to the chat',
             "count":notification[socket.id]["count"],
