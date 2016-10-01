@@ -214,7 +214,7 @@ router.post('/signup',function(req,res,next){
         }else{
           var user_name = req.body.user;
           var password = req.body.password
-          var img_url = 'images/'+req.file.filename
+          var img_url = req.file.filename
           getSecurePassword(password,function(err,hashCreated,saltToString){
             if(err){
               return res.json({"statusCode":0})

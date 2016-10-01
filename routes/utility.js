@@ -148,8 +148,9 @@ var checkAllNotificationInDB = function(userId,key,maxNotificationId){
               return
             }
             else{
+              console.log(":rows",rows)
               sendPublicInfo(rows)
-              var notificationDataForUnRead = rows.rows[0].unreadmessage;
+              var notificationDataForUnRead = rows.rows[0].unreadmessage || rows.rows[0].get_new_notification.
               sendPublicInfo(notificationDataForUnRead)
               if(notificationDataForUnRead != null){
                 notification[key]["count"] += notificationDataForUnRead.length
