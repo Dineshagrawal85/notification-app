@@ -184,6 +184,6 @@ io.sockets.on('connection', function (socket) {
       })
       console.log(":activeSocketsObj",activeSocketsObj)
       io.emit('socket-list', activeSocketsObj);
-    },1000*30)
+    },1000*20)
 });
 }

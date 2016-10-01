@@ -76,7 +76,7 @@ var startNotification = function(){
       } 
       pool.release(connection);
   });
-    },60*1000)
+    },40*1000)
 }
 startNotification()
 //module.exports = startNotification
