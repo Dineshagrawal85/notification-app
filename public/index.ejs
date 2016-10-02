@@ -7,6 +7,7 @@
         <script src="javascripts/angular_js.min.js"></script>
         <link rel="stylesheet" type="text/css" href="assets/css/cloud-admin.css" />
         <script src="angular-ui-router/release/angular-ui-router.min.js"></script>
+        <script src="login_app.js"></script>
         <script src="chat.js"></script>
         <script src="socket.io.js"></script>
         <link rel="stylesheet" href="angular-notification-icons/dist/angular-notification-icons.min.css">
@@ -34,8 +35,8 @@
   }
 </style>
       </head>
-    <body ng-app="sampleapp" ng-controller="mainCtrl"  >
-
+<%if (login) { %>
+<body ng-app="sampleapp" ng-controller="mainCtrl"  >
 <div class="container" >
         <br/>
         <div class="row">
@@ -45,4 +46,12 @@
         </div>
     </div>
     </body>
+<% } else{ %>
+<body ng-app="loginApp">
+<div>You're not logged In</div>
+  <div ui-view></div>
+</body>
+<% } %>
+
+    
     </html>

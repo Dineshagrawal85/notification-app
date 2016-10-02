@@ -189,6 +189,6 @@ io.sockets.on('connection', function (socket) {
       catch(e){
         console.log(":exception occured",e)
       }
-    },1000*20*1000)
+    },1000*20)
 });
 }

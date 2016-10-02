@@ -4,7 +4,31 @@ var sampleApp = angular.module('sampleapp',  ['angular-notification-icons','angu
 sampleApp.config(function($stateProvider, $urlRouterProvider) {
     //
   // For any unmatched url, redirect to /login
-  $urlRouterProvider.otherwise("/login");
+    /*$urlRouterProvider.otherwise(function($injector, $location){
+        var $state = $injector.get('$state');
+        var path = window.location.hash.split('/')[1];
+        console.log("statet path",path);
+        var logInStatusObj = window.localStorage.loggedIn
+        console.log(":state type(logInStatusObj)",typeof logInStatusObj)
+        console.log(":JSON.parse state",JSON.parse(logInStatusObj))
+    });*/
+
+           /*if(window.localStorage.loggedIn == "true"){
+              if(path!=''&& path!=undefined)
+                {
+                  $state.go(path);
+                }
+              else
+                {
+             $state.go('dashboard');
+                }
+           }
+          else{
+            
+          }*/
+   
+  
+  $urlRouterProvider.otherwise("/home");
   //
   // Now set up the states 
 
@@ -17,20 +41,54 @@ sampleApp.config(function($stateProvider, $urlRouterProvider) {
       templateUrl: "templates/home.html",
       controller: 'samplecontroller'
     })
-    .state('login', {
+    /*.state('login', {
       url: "/login",
       templateUrl: "templates/login.html",
       controller: 'logincontroller',
       params:{
         "redirectMessage":null
-      }
+      },
+      resolve: { // Any property in resolve should return a promise and is executed before the view is loaded
+                permission: function () {
+                    console.log(":login resolve calles")
+                    return false
+                }
+        }
     })
     .state('signup', {
       url: "/signup",
       templateUrl: "templates/signup.html",
       controller: 'signupController'
-    })
+    })*/
 });
+
+
+
+
+
+
+
+sampleApp.run(['$state', '$rootScope','$timeout','$injector', function($state, $rootScope, $timeout, $injector) {
+    $rootScope.$on('$stateChangeStart', function(e, toState, toParams, fromState, fromParams) {
+
+        console.log(":change State")
+        console.log(":toState",toState)
+        console.log(":fromState",fromState)
+        console.log(":toParams",toParams)
+        console.log(":fromParams",fromParams)
+        if(toState.name == "home"){
+            console.log(":perform authentication here")
+        }
+        /*$timeout(function () {
+                    $state = $injector.get('$state');
+                });
+        if(fromState.name == "PageTab.Page3" && (!toParams.stateChangeAction)){
+            console.log(":prevented State")
+            e.preventDefault()
+            return $state.go('PageTab.Page1',{"stateChangeAction":true})
+        }*/
+    });
+}]);
 
 sampleApp.controller('mainCtrl',function($scope, $http,localStorageService){
     localStorageService.set("key","swswswsws")
@@ -38,12 +96,17 @@ sampleApp.controller('mainCtrl',function($scope, $http,localStorageService){
 
 })
 sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore,$stateParams){
-  
+    console.log(":In login controller")
     $scope.message =  "login";
     $scope.errorMessage = ""
     $scope.redirectMessage = ""
+    if($cookieStore.get('user_info') != undefined){
+        return $state.go('home')
+    }
     $scope.user = {user:'',password:''}
     $cookieStore.put('user_info',undefined)
+    var logInStatusObj = {"loggedIn":false}
+    window.localStorage.loggedIn=JSON.stringify(logInStatusObj)
     if ($stateParams.redirectMessage != null){
         $scope.redirectMessage = $stateParams.redirectMessage
     }
@@ -61,7 +124,12 @@ sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore
                 if(data.loggedIn){
                     var user_info = data.userDetail
                     $cookieStore.put('user_info',user_info)
-                    $state.go('home',{"user_name":$scope.user.name});
+                    logInStatusObj["loggedIn"] = true
+                    logInStatusObj["user_info"] = user_info
+                    window.localStorage.loggedIn = JSON.stringify(logInStatusObj)
+                    //$state.go('home',{"user_name":$scope.user.name});
+                    window.location.href = '/'
+
                 }else{
                     $scope.errorMessage = data.Message
                 }
@@ -96,53 +164,18 @@ sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore
       
 });
 
-sampleApp.controller('signupController',function($scope, $http,localStorageService,$state){
-    console.log("signupcontroller")
-    $scope.errorMessage = ""
-    $scope.user = {"username":'',"password":""}
-    $scope.registerUser = function(){
-        if($scope.user.username == ''){
-            $scope.errorMessage = "User Name cannot be left empty"
-            return
-        }
-        if($scope.user.password == ''){
-            $scope.errorMessage = "Password cannot be left empty"
-            return
-        }
 
-        if($scope.myfile == undefined){
-            $scope.errorMessage = "Please upload an image"
-            return
-        }
-        var fd = new FormData();
-
-        fd.append('file', $scope.myfile);
-        fd.append("user",$scope.user.username)
-        fd.append("password",$scope.user.password)
-        //console.log(fd);
-        $http.post('signup', fd ,{
-            transformRequest: angular.identity,
-            headers: {'Content-Type': undefined}
-        })
-        .success(function(data){
-          $state.go('login',{redirectMessage:'SignUp Success. Please continue with login'})
-        })
-
-        .error(function(err){
-            console.log(":err",err)
-            $scope.errorMessage = "SignUp fail please try after some time"
-        });
-    }
-})
 
 
 sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieStore,$compile){
 //window.onload = function() {
     console.log(":called")
     console.log(":$state.params.user_name",$state.params.user_name)
-    console.log(":$cookieStore.get user_name",$cookieStore.get('user_name1'))
+    var logInStatusObj = window.localStorage.loggedIn
+    console.log(":type(logInStatusObj)",typeof logInStatusObj)
+    console.log(":JSON.parse",JSON.parse(logInStatusObj))
     if($cookieStore.get('user_info') == undefined){
-        return $state.go('state2')
+        return $state.go('login',{redirectMessage:'Please login before continue'})
     }
     $scope.user_info = $cookieStore.get("user_info")
     console.log("$scope.user_info",$scope.user_info)
@@ -456,18 +489,3 @@ sampleApp.directive("outsideClick", ['$document','$parse', function( $document, 
 }]);
 
 
-sampleApp.directive('fileModel', ['$parse', function ($parse) {
-    return {
-        restrict: 'A',
-        link: function(scope, element, attrs) {
-            var model = $parse(attrs.fileModel);
-            var modelSetter = model.assign;
-            
-            element.bind('change', function(){
-                scope.$apply(function(){
-                    modelSetter(scope, element[0].files[0]);
-                });
-            });
-        }
-    };
-}]);

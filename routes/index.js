@@ -179,6 +179,8 @@ router.post('/login',function(req,res,next){
                 var generatedPassword = md5(result["salt"]+password)
                 if(generatedPassword == result["hash"]){
                   var userDetail = {"user_id":result["id"],"user_name":result["name"],"img_url":result["img_url"]}
+                  req.session.userDetail = userDetail
+                  console.log(":req.session",req.session)
                   res.json({"statusCode":1,"loggedIn":true,"userDetail":userDetail})
                 }else{
                   res.json({"statusCode":1,"loggedIn":false,"Message":"Wrong Password"})
@@ -210,7 +212,7 @@ router.post('/signup',function(req,res,next){
         if(err) {
             console.log("File uploading error");
             logger.log("error","File uploading error"+err)
-            return res.end("Error uploading file.");
+            return res.json({"statusCode":0});
         }else{
           var user_name = req.body.user;
           var password = req.body.password
@@ -246,6 +248,10 @@ router.post('/signup',function(req,res,next){
           })
         }
   })
+})
+
+router.get('/session',function(req,res,next){
+  res.json(req.session)
 })
 
 

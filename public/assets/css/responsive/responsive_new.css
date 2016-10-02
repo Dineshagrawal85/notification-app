@@ -1,0 +1,5 @@
+   .online{ float: left;   border-radius: 100%; max-width: 48px; margin-right: 25px;margin-top: -8px; border: 5px #0f0 solid;}
+   	.mouse-hand { cursor: pointer; }
+	.chat-hide{display:none}
+	.logo-set{width:30px; height:38px;}
+	.public-user-picture{    width: 121px;  height: 100px;}

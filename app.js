@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var ejs = require('ejs');
 
 
 var app = express();
@@ -13,16 +14,32 @@ var socketClients = require('./socketClients')
 var notificationHistory = require('./notificationhistory')
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-app.use(session({secret: 'ssshhhhh'}));
+app.use(session({ secret: 'sassasasas', cookie: { maxAge: 60000 }}))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+//app.use(cookieParser());
+//app.use(require('./middlewares/session_filter')(app))
+app.get('/',function(req,res,next){
+  //console.log(":/")
+  //console.log(":req",req.url)
+  //console.log(":req.session",req.session)
+  //res.redirect("/#/login")
+  if(req.session.userDetail == undefined){
+    return res.render('/home/Dinesh/work/notification-app/public/index.ejs',{"login":false});
+  }else{
+    return res.render('/home/Dinesh/work/notification-app/public/index.ejs',{"login":true});
+  }
+})
+
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+require('./middlewares/session_filter')(app);
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -96,10 +113,7 @@ app.use(function(req, res, next) {
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
+    res.json({"statusCode":0});
   });
 }
 
@@ -107,10 +121,7 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
+  res.json({"statusCode":0});
 });
 
 var sendToAll = function(socketId){
