@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var ejs = require('ejs');
-
+var path = require('path')
 
 var app = express();
 var array = require('./array.js')
@@ -29,10 +29,12 @@ app.get('/',function(req,res,next){
   //console.log(":req",req.url)
   //console.log(":req.session",req.session)
   //res.redirect("/#/login")
+  var dirname = __dirname
+  var ejsPath = path.join(dirname,'public/index.ejs')
   if(req.session.userDetail == undefined){
-    return res.render('/home/Dinesh/work/notification-app/public/index.ejs',{"login":false});
+    return res.render(ejsPath,{"login":false});
   }else{
-    return res.render('/home/Dinesh/work/notification-app/public/index.ejs',{"login":true});
+    return res.render(ejsPath,{"login":true});
   }
 })
 
