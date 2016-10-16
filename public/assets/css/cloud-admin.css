@@ -288,7 +288,7 @@ img {
 }
 .img-responsive {
   display: block;
-  max-width: 100%;
+  max-width: 66%;
   height: auto;
 }
 .img-rounded {
@@ -670,7 +670,7 @@ pre code {
   margin-left: auto;
   padding-left: 15px;
   padding-right: 15px;
-  background-color: seagreen;
+  background-color: #72A18F;
 }
 .container:before,
 .container:after {
@@ -685,7 +685,7 @@ pre code {
   clear: both;
 }
 .container:before,
-.container:after {
+\.container:after {
   content: " ";
   /* 1 */
 
@@ -3936,7 +3936,7 @@ textarea.input-group-sm > .input-group-btn > .btn {
   }
 }
 .navbar-nav > li > .dropdown-menu {
-  margin-top: 0;
+  margin-top: -20px;
   border-top-right-radius: 0;
   border-top-left-radius: 0;
 }

@@ -1,4 +1,4 @@
-var loginApp = angular.module('loginApp',['LocalStorageModule','ui.router','ngCookies'])
+var loginApp = angular.module('loginApp',['LocalStorageModule','ui.router','ngCookies','toaster','ngAnimate'])
 loginApp.config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise("/login");
   //
@@ -27,7 +27,7 @@ loginApp.config(function($stateProvider, $urlRouterProvider) {
 })
 
 
-loginApp.controller('logincontroller',function($scope,$http,$cookieStore,$state,$stateParams){
+loginApp.controller('logincontroller',function($scope,$http,$cookieStore,$state,$stateParams,toaster){
     console.log(":In login controller")
     $scope.message =  "login";
     $scope.errorMessage = ""
@@ -71,23 +71,8 @@ loginApp.controller('logincontroller',function($scope,$http,$cookieStore,$state,
             }
         })
         .error(function(error) {
-          //$state.go('login');
-            //console.log('Error: ' + error);
             $scope.errorMessage = "Internal Server Error. Please try after some time"
         });
-        /*if($scope.user.user == "samar"){
-            user_id = 1
-            img_url = "image6.jpg"
-        }else if ($scope.user.user == "ravindra"){
-            user_id = 2
-            img_url = "image1.jpg"
-        }else{
-            user_id = 3
-            img_url = "image2.jpg"
-        }
-        var user_info = {"user_name":$scope.user.user,"user_id":user_id,"img_url":img_url}
-        $cookieStore.put('user_info',user_info)
-        $state.go('login',{"user_name":$scope.user.user});*/
   }
 
   $scope.redirectToSignUp = function(){

@@ -1,5 +1,5 @@
 //angular.app("sampleApp").controller("sampleController")
-var sampleApp = angular.module('sampleapp',  ['angular-notification-icons','angular-click-outside','ui.router','ngCookies','LocalStorageModule'])
+var sampleApp = angular.module('chatApp',  ['angular-notification-icons','angular-click-outside','ui.router','ngCookies','LocalStorageModule','toaster','ngAnimate'])
 
 sampleApp.config(function($stateProvider, $urlRouterProvider) {
     //
@@ -35,6 +35,15 @@ sampleApp.config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
     .state('home', {
       url: "/home",
+      params:{
+        "user_name": null
+      },
+      templateUrl: "templates/home1.html",
+      controller: 'samplecontroller'
+    })
+
+    .state('home1', {
+      url: "/home1",
       params:{
         "user_name": null
       },
@@ -95,7 +104,12 @@ sampleApp.controller('mainCtrl',function($scope, $http,localStorageService){
     console.log(":localStorageService",localStorageService.get("key"))
 
 })
-sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore,$stateParams){
+
+sampleApp.controller('samplecontroller1',function($scope, $http,localStorageService){
+    console.log(":localStorageService",localStorageService.get("key"))
+
+})
+sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore,$stateParams,toaster){
     console.log(":In login controller")
     $scope.message =  "login";
     $scope.errorMessage = ""
@@ -110,7 +124,7 @@ sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore
     if ($stateParams.redirectMessage != null){
         $scope.redirectMessage = $stateParams.redirectMessage
     }
-
+    
     $scope.submit=function()
       {
         if($scope.user.user == '' || $scope.user.password ==''){
@@ -167,7 +181,7 @@ sampleApp.controller('logincontroller',function($scope,$http,$state,$cookieStore
 
 
 
-sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieStore,$compile){
+sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieStore,$compile,toaster){
 //window.onload = function() {
     console.log(":called")
     console.log(":$state.params.user_name",$state.params.user_name)
@@ -182,7 +196,7 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
     var messages = [];
     var socket = io.connect('/');
     var field = document.getElementById("field");
-    var sendButton = document.getElementById("send");
+    var sendButton = document.getElementById("public_chat_send");
     var content = document.getElementById("content");
     $scope.clientId = ""
     $scope.count = 10
@@ -193,17 +207,25 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
     $scope.showList = false
     $scope.chatProposals = []
     $scope.privateChatSession = {"enable":false}
+    $scope.publicMessageArray = []
+    $scope.privateMessageArray =  []
    /* setTimeout(function(){
         $scope.count = 20
     },10000)*/
+
     socket.on('message', function (data) {
         if(data.message) {
-            messages.push(data.message);
+            /*messages.push(data.message);
             var html = '';
             for(var i=0; i<messages.length; i++) {
                 html += messages[i] + '<br />';
-            }
-            content.innerHTML = html;
+            }*/
+            //content.innerHTML = html;
+            var messageObj = {}
+            messageObj["created_by"] = 'System';
+            messageObj["messsage"] = data.message
+            messageObj["img_url"] = 'chat-logo.jpg'
+            $scope.publicMessageArray.push(messageObj)
             $scope.$apply(function(){
                 $scope.notification["list"] = data["list"]
                 $scope.notification["count"] = data["count"]
@@ -214,6 +236,7 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
             $scope.notification["count"] = data["count"]*/
             $scope.clientId = data.clientId
             console.log(":$scope.notification",$scope.notification)
+            $('.box-body').scrollTop($('#public_chat').height()+50)
         } else {
             console.log("There is a problem:", data);
         }
@@ -223,12 +246,22 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
     socket.emit('info',{"user_info":$scope.user_info})
     socket.on('newmessage',function(data){
         if(data.message) {
-            messages.push(data.notification.name +": "+data.message);
+            /*messages.push(data.notification.name +": "+data.message);
             var html = '';
             for(var i=0; i<messages.length; i++) {
                 html += messages[i] + '<br />';
             }
-            content.innerHTML = html;
+            content.innerHTML = html;*/
+            var messageDetailObj = {}
+            messageDetailObj["created_by"] = data.notification.name;
+            messageDetailObj["messsage"] = data.message
+            try{
+                messageDetailObj["img_url"] = $scope.activeSockets[data.notification.id].img_url
+            }
+            catch(e){
+                messageDetailObj["img_url"] = ""
+            }
+            $scope.publicMessageArray.push(messageDetailObj)
             $scope.$apply(function() {
             //$scope.globalVar.turnNumber = data.number;
             //$scope.globalVar.currentPlayer = data.currentPlayer;
@@ -237,6 +270,10 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
             //$scope.notification["count"] += 1 
             $scope.messageObj["count"] += 1
             $scope.messageObj["list"].splice(0, 0, data.notification);
+            console.log(":scope.messageObj",$scope.messageObj)
+            setTimeout(function(){
+                $('.box-body').scrollTop($('#public_chat').height()+50)
+            },200)
             //$scope.notification["read"] = data.read
         });
         } else {
@@ -307,14 +344,18 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
         if(responseObj["acceptance"]){
             //startPrivateChatSession(responseObj["destinationUserInfo"]);
             console.log("Your Request to Private Chat is Accepted....Initiating Private Chat Session")
+            toaster.pop('success', "Private Chat Notification", "Your Request to Private Chat with " +responseObj["destinationUserInfo"].user_name +" is Accepted....Initiating Private Chat Session",10000);
         }else{
             console.log("Your Request to Private Chat is Denied by Destination User")
+            toaster.pop('error', "Private Chat Notification", "Your Request to Private Chat with " +responseObj["destinationUserInfo"].user_name +" is Rejected.",10000);
         }
     })
 
     //When It accepts proposal This Invokes Private Chat Session
     socket.on('private-chat-session-start',function(destinationUserInfo){
+        console.log("private-chat-session-start")
         //console.log(":your chat proposal response",responseObj["acceptance"])
+        //$(".private-chat-window").removeClass("chat-hide");
             startPrivateChatSession(destinationUserInfo);
     })
 
@@ -323,7 +364,13 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
         var message = receivedMessage["message"]
         if(receivedMessage.sourceUserId.user_id == $scope.privateChatSession["destinationUserDetails"].user_id){
             console.log(":you received message ",message)
-            appendMessageInPrivateChat($scope.privateChatSession["destinationUserDetails"].user_name,message)
+             /*var messageObj = {}
+        messageObj["created_by"] = $scope.privateChatSession["destinationUserDetails"].user_name;
+        messageObj["img_url"] = $scope.privateChatSession["destinationUserDetails"]["img_url"]
+        messageObj["messsage"] = message*/
+
+        //$scope.privateMessageArray.push(messageObj)
+            appendMessageInPrivateChat($scope.privateChatSession["destinationUserDetails"].user_name,message,$scope.privateChatSession["destinationUserDetails"]["img_url"])
         }
     })
 
@@ -331,6 +378,7 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
     socket.on('private-chat-session-source-missing',function(sourceUserDetail){
         console.log(":Source You want to Private chat with is Disconnected")
         console.log(":sourceUserDetail",sourceUserDetail)
+        toaster.pop('error', "Private Chat Notification", " " +sourceUserDetail.user_name +",is disconnected",10000);
     })
 
     //This is invoked when the user you are chatting with disconnectes or close the Private Chat
@@ -339,9 +387,11 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
     socket.on('private-chat-session-over',function(reasonCode){
         if(reasonCode.code == 0){
             console.log(":destination user disconnected")
+            toaster.pop('error', "Private Chat Notification", "Closing Private Chat Session, "+$scope.privateChatSession.destinationUserDetails.user_name+" is disconnected.",10000);
             terminatePrivateChatSession()
         }else if(reasonCode.code == 1){
             console.log(":destination user Closes it's Private Chat Session")
+            toaster.pop('error', "Private Chat Notification", "Closing Private Chat Session, "+$scope.privateChatSession.destinationUserDetails.user_name+" closed Private Chat Session with you.",10000);
             terminatePrivateChatSession()
         }
     })
@@ -356,10 +406,12 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
 
     //This is called to Terminate present Private Chat Session
     var terminatePrivateChatSession = function(){
-        angular.element('#private_chat_content').empty()
+        //angular.element('#private_chat_content').empty()
+        $scope.privateMessageArray = []
         $scope.privateChatSession = {"enable":false,"destinationUserDetails":{},input:""}
     }
-    //Invoke when someone clicks on submit on private chat session
+
+    /*//Invoke when someone clicks on submit on private chat session
     $scope.privateChatSessionSubmit = function(){
         console.log(":submit called")
         if($scope.privateChatSession.input == "")
@@ -367,25 +419,83 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
         var messageObj = {"user_id":$scope.privateChatSession["destinationUserDetails"]["user_id"],
                           "message":$scope.privateChatSession.input}
         socket.emit('private-chat-session',messageObj)
-        appendMessageInPrivateChat("Me",$scope.privateChatSession.input)
+        appendMessageInPrivateChat("Me",$scope.privateChatSession.input,$scope.user_info["img_url"])
         console.log(":privateChatSession.input",$scope.privateChatSession.input)
         $scope.privateChatSession.input = ""
-    }
+    }*/
 
-    sendButton.onclick = function() {
+    var sensMsgInPublicChat = sendButton.onclick = function() {
+        if($scope.public_chat_message == "")
+            return
         //console.log(":called");
-        var text = field.value;
-        field.value = ""
+        var text = $scope.public_chat_message //field.value;
+        $scope.public_chat_message = ""
+        //field.value = ""
         console.log(":socket clientid",socket.clientId)
         socket.emit('send', { message: text });
-        messages.push("me" +": "+text);
+        var messageObj = {}
+        messageObj["created_by"] = 'Me';
+        messageObj["messsage"] = text
+        messageObj["img_url"] = $scope.user_info["img_url"]
+        $scope.publicMessageArray.push(messageObj)
+        setTimeout(function(){
+            $('.box-body').scrollTop($('#public_chat').height()+50)
+        },200)
+        /*messages.push("me" +": "+text);
             var html = '';
             for(var i=0; i<messages.length; i++) {
                 html += messages[i] + '<br />';
             }
-        content.innerHTML = html;
+        content.innerHTML = html;*/
 
     };
+
+    $scope.sendMessageInPublicChat = function(event){
+        if(event.which == 13){
+            sensMsgInPublicChat()
+        }
+    }
+
+    var privateChatSendButton = document.getElementById("btn-chat");
+    //Invoke when someone clicks on submit on private chat session
+    var sendMessageInPrivateChat = privateChatSendButton.onclick = function(){
+        if ($scope.private_chat_message == "")
+            return
+        var text = $scope.private_chat_message
+        $scope.private_chat_message = ""
+        /*var messageObj = {}
+        messageObj["created_by"] = 'Me';
+        messageObj["img_url"] = $scope.user_info["img_url"]
+        messageObj["messsage"] = text*/
+
+        var messageObjToSend = {"user_id":$scope.privateChatSession["destinationUserDetails"]["user_id"],
+                          "message":text}
+        socket.emit('private-chat-session',messageObjToSend)
+        //$scope.privateMessageArray.push(messageObj)
+
+
+
+
+         //Invoke when someone clicks on submit on private chat session
+    //$scope.privateChatSessionSubmit = function(){
+        console.log(":submit called")
+        
+        
+        appendMessageInPrivateChat("Me",text, $scope.user_info["img_url"])
+    //}
+
+
+
+
+    }
+
+
+    $scope.sendMessageInPrivateChat = function(event){
+        if(event.which == 13){
+            //sensMsgInPublicChat()
+            sendMessageInPrivateChat()
+        }
+    }
 
     $scope.updateReadNotificationCount = function(){
         $scope.showList = true
@@ -423,8 +533,15 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
         //This Condition will be true when you try to start a private chat session with a Busy user
         if(obj["status"] == 'Busy'){
             console.log("You're Requesting for a Private Chat Session with a user who is already involved in a Private Chat.This Action is not allowed")
+            toaster.pop('error', "You're Requesting for a Private Chat Session with a user who is already involved in a Private Chat.This Action is not allowed.",10000);
             return
         }
+
+        if($scope.privateChatSession.enable){
+            toaster.pop('error', "You're already involved in a Private Chat.This Action is not allowed.",10000);
+            return
+        }
+
         socket.emit('private-chat-request',obj)
     }
 
@@ -437,6 +554,7 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
         Private Chat Session Request before closing the previous one. So system will not allow you*/ 
         if(destinationUserResponse && $scope.privateChatSession["enable"]){
             console.log("You have a active Private Chat Session. You can't proceed with more than one Private Chat Sessions at a time")
+            toaster.pop('error', "You have an active Private Chat Session. You can't proceed with more than one Private Chat Sessions at a time",10000);
             return
         }
         console.log(":after if")
@@ -458,13 +576,285 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
         terminatePrivateChatSession()
     }
 
-    var appendMessageInPrivateChat = function(userName,message){
-        var elm = angular.element("#private_chat_content")
+    var appendMessageInPrivateChat = function(userName,message,imgUrl){
+        /*var elm = angular.element("#private_chat_content")
         var template = "<span>"+userName[0].toUpperCase() +userName.substring(1,userName.length) + " : "+message+"</span><br />"
         var elToAppend = $compile(template)($scope);
-        elm.append(elToAppend);
+        elm.append(elToAppend);*/
+
+        var messageObj = {}
+        messageObj["created_by"] = userName;
+        messageObj["img_url"] = imgUrl
+        messageObj["messsage"] = message
+        $scope.privateMessageArray.push(messageObj)
+        setTimeout(function(){
+            $('.msg_container_base').scrollTop($('.msg_container_base').scrollTop()+500)
+        },200)
     }
 
+    //This is invoked to logout the user
+    $scope.logOutUser = function(){
+        $http.get('/logout', $scope.user)
+        .success(function(data) {
+            window.location.href =  '/'
+        })
+        .error(function(error) {
+            $scope.errorMessage = "Internal Server Error. Please try after some time"
+        });
+    }
+
+
+
+
+    jQuery('.box .tools .collapse,.box  .tools .expand').click(function () {
+    
+            var el = jQuery(this).parents(".box").children(".box-body");
+      
+            if (jQuery(this).hasClass("collapse")) {
+      
+        jQuery(this).removeClass("collapse").addClass("expand");
+                var i = jQuery(this).children(".fa-chevron-up");
+        i.removeClass("fa-chevron-up").addClass("fa-chevron-down");
+                el.slideUp(200);
+            } else {
+        jQuery(this).removeClass("expand").addClass("collapse");
+                var i = jQuery(this).children(".fa-chevron-down");
+        i.removeClass("fa-chevron-down").addClass("fa-chevron-up");
+                el.slideDown(200);
+            }
+        });
+    
+    /* Close */
+    jQuery('.tools a.remove').click(function () {
+            var removable = jQuery(this).parents(".box");
+            if (removable.next().hasClass('box') || removable.prev().hasClass('box')) {
+                jQuery(this).parents(".box").remove();
+            } else {
+                jQuery(this).parents(".box").parent().remove();
+            }
+        });
+    
+    
+        $('.footer-tools').on('click', '.go-top', function (e) {
+      
+      App.scrollTo();
+      e.preventDefault();
+    });
+
+    $(".online-user" ).click(function() {
+  $(".private-chat-window").removeClass("chat-hide");
+});
+  
+
+$(document).on('click', '.panel-heading span.icon_minim', function (e) {
+    var $this = $(this);
+    if (!$this.hasClass('panel-collapsed')) {
+        $this.parents('.panel').find('.panel-body').slideUp();
+        $this.addClass('panel-collapsed');
+        $this.removeClass('glyphicon-minus').addClass('glyphicon-plus');
+    } else {
+        $this.parents('.panel').find('.panel-body').slideDown();
+        $this.removeClass('panel-collapsed');
+        $this.removeClass('glyphicon-plus').addClass('glyphicon-minus');
+    }
+});
+$(document).on('focus', '.panel-footer input.chat_input', function (e) {
+    var $this = $(this);
+    if ($('#minim_chat_window').hasClass('panel-collapsed')) {
+        $this.parents('.panel').find('.panel-body').slideDown();
+        $('#minim_chat_window').removeClass('panel-collapsed');
+        $('#minim_chat_window').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+    }
+});
+$(document).on('click', '#new_chat', function (e) {
+    var size = $( ".chat-window:last-child" ).css("margin-left");
+     size_total = parseInt(size) + 400;
+    var clone = $( "#chat_window_1" ).clone().appendTo( ".container" );
+    clone.css("margin-left", size_total);
+});
+/*$(document).on('click', '#privateChatWindow', function (e) {
+    //$(this).parent().parent().parent().parent().remove();
+    $( "#chat_window_1" ).addClass('chat-hide');
+});*/
+  
+  /*$( document ).ready(function() {
+   handleChat();
+});*/
+  
+  /*var handleChat = function (elem) {
+  
+    var append = function() {
+      //Check if chat is empty
+            var input = $('.'+elem+' .chat-form input');
+            var text = input.val();
+            if (text.length == 0) {
+                return;
+            }
+      
+      //Get time
+      var curr_time = moment().format('YYYY-MM-DD HH:mm:ss');
+      
+      var msg = '';
+                msg +='<li class="animated fadeInLeft media">';
+        msg +=  '<a class="pull-right" href="#">';
+        msg +=  '<img class="media-object" alt="Generic placeholder image" src="img/chat/headshot2.jpg">';
+        msg +=  '</a>';
+        msg +=  '<div class="pull-right media-body chat-pop mod">';
+        msg +=  '<h4 class="media-heading">You <span class="pull-left"><abbr id="curr-time" class="timeago" title="'+curr_time+'" >'+curr_time+'</abbr> <i class="fa fa-clock-o"></i></span></h4>';
+        msg +=  text;
+        msg +=  '</div>';
+        msg +='</li>';
+        
+      var list = $('.'+elem+' .chat-list');
+      list.append(msg);
+      jQuery("abbr.timeago").timeago();
+      input.val("");
+            $('.'+elem+' .scroller').slimScroll({
+                scrollTo: list.height()
+            });
+    }
+    //If button is pressed
+    $('.'+elem+' .chat-form .btn').click(function(e){
+      e.preventDefault();
+      append();
+    });
+    
+    var input = $('.'+elem+' .chat-form input');
+    //If Enter is pressed
+    input.keypress(function (e) {
+      if (e.which == 13) {
+        append();
+        return false;
+      }
+    });
+  }*/
+
+})
+
+sampleApp.controller('chatController',function($scope){
+    console.log(":chat controller loaded")
+    jQuery('.box .tools .collapse,.box  .tools .expand').click(function () {
+    
+            var el = jQuery(this).parents(".box").children(".box-body");
+      
+            if (jQuery(this).hasClass("collapse")) {
+      
+        jQuery(this).removeClass("collapse").addClass("expand");
+                var i = jQuery(this).children(".fa-chevron-up");
+        i.removeClass("fa-chevron-up").addClass("fa-chevron-down");
+                el.slideUp(200);
+            } else {
+        jQuery(this).removeClass("expand").addClass("collapse");
+                var i = jQuery(this).children(".fa-chevron-down");
+        i.removeClass("fa-chevron-down").addClass("fa-chevron-up");
+                el.slideDown(200);
+            }
+        });
+    
+    /* Close */
+    jQuery('.tools a.remove').click(function () {
+            var removable = jQuery(this).parents(".box");
+            if (removable.next().hasClass('box') || removable.prev().hasClass('box')) {
+                jQuery(this).parents(".box").remove();
+            } else {
+                jQuery(this).parents(".box").parent().remove();
+            }
+        });
+    
+    
+        $('.footer-tools').on('click', '.go-top', function (e) {
+      
+      App.scrollTo();
+      e.preventDefault();
+    });
+
+    $(".online-user" ).click(function() {
+  $(".private-chat-window").removeClass("chat-hide");
+});
+  
+
+$(document).on('click', '.panel-heading span.icon_minim', function (e) {
+    var $this = $(this);
+    if (!$this.hasClass('panel-collapsed')) {
+        $this.parents('.panel').find('.panel-body').slideUp();
+        $this.addClass('panel-collapsed');
+        $this.removeClass('glyphicon-minus').addClass('glyphicon-plus');
+    } else {
+        $this.parents('.panel').find('.panel-body').slideDown();
+        $this.removeClass('panel-collapsed');
+        $this.removeClass('glyphicon-plus').addClass('glyphicon-minus');
+    }
+});
+$(document).on('focus', '.panel-footer input.chat_input', function (e) {
+    var $this = $(this);
+    if ($('#minim_chat_window').hasClass('panel-collapsed')) {
+        $this.parents('.panel').find('.panel-body').slideDown();
+        $('#minim_chat_window').removeClass('panel-collapsed');
+        $('#minim_chat_window').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+    }
+});
+$(document).on('click', '#new_chat', function (e) {
+    var size = $( ".chat-window:last-child" ).css("margin-left");
+     size_total = parseInt(size) + 400;
+    var clone = $( "#chat_window_1" ).clone().appendTo( ".container" );
+    clone.css("margin-left", size_total);
+});
+$(document).on('click', '#privateChatWindow', function (e) {
+    //$(this).parent().parent().parent().parent().remove();
+    $( "#chat_window_1" ).addClass('chat-hide');
+});
+  
+  /*$( document ).ready(function() {
+   handleChat();
+});*/
+  
+  /*var handleChat = function (elem) {
+  
+    var append = function() {
+      //Check if chat is empty
+            var input = $('.'+elem+' .chat-form input');
+            var text = input.val();
+            if (text.length == 0) {
+                return;
+            }
+      
+      //Get time
+      var curr_time = moment().format('YYYY-MM-DD HH:mm:ss');
+      
+      var msg = '';
+                msg +='<li class="animated fadeInLeft media">';
+        msg +=  '<a class="pull-right" href="#">';
+        msg +=  '<img class="media-object" alt="Generic placeholder image" src="img/chat/headshot2.jpg">';
+        msg +=  '</a>';
+        msg +=  '<div class="pull-right media-body chat-pop mod">';
+        msg +=  '<h4 class="media-heading">You <span class="pull-left"><abbr id="curr-time" class="timeago" title="'+curr_time+'" >'+curr_time+'</abbr> <i class="fa fa-clock-o"></i></span></h4>';
+        msg +=  text;
+        msg +=  '</div>';
+        msg +='</li>';
+        
+      var list = $('.'+elem+' .chat-list');
+      list.append(msg);
+      jQuery("abbr.timeago").timeago();
+      input.val("");
+            $('.'+elem+' .scroller').slimScroll({
+                scrollTo: list.height()
+            });
+    }
+    //If button is pressed
+    $('.'+elem+' .chat-form .btn').click(function(e){
+      e.preventDefault();
+      append();
+    });
+    
+    var input = $('.'+elem+' .chat-form input');
+    //If Enter is pressed
+    input.keypress(function (e) {
+      if (e.which == 13) {
+        append();
+        return false;
+      }
+    });
+  }*/
 })
 
 sampleApp.directive("outsideClick", ['$document','$parse', function( $document, $parse ){

@@ -101,10 +101,10 @@
   border-style: none solid solid !important;
   border-width: 0 1px 1px !important;  
   }
-.dropdown-menu > li >  a {
+/*.dropdown-menu > li >  a {
   background-color: #FFFFFF !important;
   color: #555 !important;
-  }
+  }*/
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus {
   background-color: none !important;
@@ -123,7 +123,7 @@
 /* Notification */
 .dropdown-menu.notification {
   border-top: 1px solid #FAFAFA;
-  width: 270px;
+  width: 300px;
 }
 .dropdown-menu.notification .label { 
   display: inline-block;

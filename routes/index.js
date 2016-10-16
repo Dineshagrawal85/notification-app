@@ -251,8 +251,24 @@ router.post('/signup',function(req,res,next){
 })
 
 router.get('/session',function(req,res,next){
-  res.json(req.session)
+  setInterval(function(){
+    console.log(":req.sesssion",req.session.cookie.originalMaxAge)
+  },2000)
+
+  XCsSUWmebuDkFUZyJ5w94E5oBJnTawq9
+  res.json(req.session.id)
 })
 
+router.get('/logout',function(req,res,next){
+  req.session.destroy(function(err,result){
+     if(err){
+       logger.log("error","Error in destroying user session")
+     }
+     else
+     {
+      res.json({"statusCode":1});
+     }
+   }); 
+})
 
 module.exports = router;

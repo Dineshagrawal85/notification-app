@@ -1,8 +1,8 @@
-
-	 <div class="container-fluid">
+	
+    <div class="container-fluid">
     	<div class="row">
     	<div class="col-md-12">
-    		<div class="col-md-6" style="float:left;">
+    		<div class="col-md-6" style="float:left;"> 
     				<div class="panel">
     						<div class="panel-heading ">
                             Public Chat Pannel
@@ -71,12 +71,11 @@
   								<i class="fa fa-envelope-o fa-3x"></i>
 							</notification-icon>
 							<div style="max-height:250px;width:300px;overflow-y:auto;">
-							<!-- <li ng-repeat="i in notification.list track by $index" ng-style="$index < (notification.count-notification.read) && {'background': 'yellow'}" ng-if="showList" >{{i}}</li> -->
 							<table class="table table-bordered table-hover" >
     
     						<tbody ng-if="showList">
 							      <tr ng-repeat="activity in notification.list track by $index"  ng-class="$index < (notification.count-notification.read)?'unread':''">
-							      <!-- ng-class = "{'active' : pageType == 'reviewOnly' && currentPage == 'ARCHIVED'}" -->
+							      
 							        <td ><img ng-src="/images/{{activity.img_url}}" style="border: 1px solid gray;height: 40px;
     width: 35px;"></td><td><strong>{{activity.name}}</strong><br /><span>{{activity.type}}</span></td>
 							      </tr>
