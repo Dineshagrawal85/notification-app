@@ -204,6 +204,7 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
     $scope.messageObj = {count:0,
         list:[]}
     $scope.activeSockets = []
+    $scope.activeSocketCount = 0
     $scope.showList = false
     $scope.chatProposals = []
     $scope.privateChatSession = {"enable":false}
@@ -323,6 +324,7 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
         delete activeSocketsObj[$scope.user_info.user_id]
         $scope.$apply(function(){
             $scope.activeSockets = activeSocketsObj
+            $scope.activeSocketCount = Object.keys(activeSocketsObj).length
         })
     })
 
