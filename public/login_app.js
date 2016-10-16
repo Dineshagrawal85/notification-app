@@ -39,9 +39,9 @@ loginApp.controller('logincontroller',function($scope,$http,$cookieStore,$state,
     $cookieStore.put('user_info',undefined)
     var logInStatusObj = {"loggedIn":false}
     window.localStorage.loggedIn=JSON.stringify(logInStatusObj)
-    /*if ($stateParams.redirectMessage != null){
+    if ($stateParams.redirectMessage != null){
         $scope.redirectMessage = $stateParams.redirectMessage
-    }*/
+    }
 
     $scope.submit=function()
       {
