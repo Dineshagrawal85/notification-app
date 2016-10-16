@@ -1,4 +1,4 @@
-var sessionLessAccess = ["/auth/authenticate","/login"]
+var sessionLessAccess = ["/auth/authenticate","/login","/signup"]
 
 module.exports = function(app){
     
