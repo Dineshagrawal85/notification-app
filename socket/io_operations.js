@@ -79,7 +79,7 @@ io.sockets.on('connection', function (socket) {
           return
         }
         socket.emit('message',
-          { message: 'welcome to the chat',
+          { message: 'Welcome to the Chat System - By \'Dinesh Agrawal\'',
             "count":notification[socket.id]["count"],
             "list":notification[socket.id]["list"],
             "read":notification[socket.id]["read"],
