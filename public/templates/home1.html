@@ -145,8 +145,8 @@
           <div class="sidebar-menu nav-collapse">
             <div class="divide-20"></div>
             <ul>
-            <li class="mouse-hand online-user" title="Available" ng-repeat="obj in activeSockets" ng-click="startPrivateChat(obj)">
-            	<a class="" ><img class="media-object online" alt="Generic placeholder image" ng-src="images/{{obj['img_url']}}" title="Available" style="height: 40px;width: 40px;"> <span class="menu-text"><i class="fa fa-circle"  ng-style="obj['status'] == 'Available' ? {'color':'green'}:{'color':'red'}"></i>{{obj["user_name"]}}</span></a>
+            <li class="mouse-hand online-user" title="{{obj['status']}}" ng-repeat="obj in activeSockets" ng-click="startPrivateChat(obj)">
+            	<a class="" ><img class="media-object online" alt="Generic placeholder image" ng-src="images/{{obj['img_url']}}" style="height: 40px;width: 40px;"> <span class="menu-text"><i class="fa fa-circle"  ng-style="obj['status'] == 'Available' ? {'color':'green'}:{'color':'red'}"></i>{{obj["user_name"]}}</span></a>
             </li>
             <li ng-if="activeSocketCount == 0" style="margin-left: 60px;">
               <span>All Users are offline</span>

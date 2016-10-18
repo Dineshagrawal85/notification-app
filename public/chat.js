@@ -334,6 +334,12 @@ sampleApp.controller('samplecontroller',function($scope, $http,$state,$cookieSto
         console.log(":private chat proposal",sourceUserDetail)
         var proposalObj = {"sourceUserDetail":sourceUserDetail}
         proposalObj["message"] = sourceUserDetail["user_name"] + " wants Private chat with you"
+        //This condition will be true when you do more that one request to the same person
+        for(i in $scope.chatProposals){
+            if($scope.chatProposals[i]['sourceUserDetail']["user_id"] == sourceUserDetail["user_id"]){
+                return
+            }
+        }
         $scope.chatProposals.unshift(proposalObj)
     })
 
