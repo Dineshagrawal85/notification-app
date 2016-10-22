@@ -2071,8 +2071,8 @@ fieldset[disabled] .btn-warning.active {
 }
 .btn-danger {
   color: #ffffff;
-  background-color: #d9534f;
-  border-color: #d43f3a;
+  background-color: #4b739a;
+  border-color: #4b739a;
 }
 .btn-danger:hover,
 .btn-danger:focus,
@@ -6064,8 +6064,8 @@ body {
   font-weight: 400;
   margin: 0;
   padding: 0;
-  color: #000;
-  /* overflow-x: hidden; */
+  color: #333333;
+  overflow-x: hidden;
 
 }
 h1,

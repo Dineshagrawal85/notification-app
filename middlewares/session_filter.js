@@ -8,8 +8,7 @@ module.exports = function(app){
 		}
 	    else if(req.session.userDetail == undefined){
 			res.statusCode = 401;
-			res.json({"statusCode":1});
-			return
+			return res.json({"statusCode":401});
 		}
 
 	})

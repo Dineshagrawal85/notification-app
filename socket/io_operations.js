@@ -113,6 +113,10 @@ io.sockets.on('connection', function (socket) {
         "destinationUserInfo":socketObjDetail[socket.id]["user_info"],
         "acceptance":responseObj["Accepted"]
       }
+
+      if(privateChatSessions[sourceUserId] != undefined){
+        console.log("private chat session is not undefined")
+      }
       //console.log(":sourceUserId",sourceUserId)
       for(key in socketObjDetail){
         var userId = socketObjDetail[key].user_info.user_id
@@ -183,7 +187,7 @@ io.sockets.on('connection', function (socket) {
          activeSocketsObj[currentUserDetail["user_id"]] = socketObjDetail[sockObj]["user_info"]
          activeSocketsObj[currentUserDetail["user_id"]]["status"] = (privateChatSessions[currentUserDetail["user_id"]] == undefined)?"Available":"Busy";
         })
-        console.log(":activeSocketsObj",activeSocketsObj)
+        //console.log(":activeSocketsObj",activeSocketsObj)
         io.emit('socket-list', activeSocketsObj);
       }
       catch(e){

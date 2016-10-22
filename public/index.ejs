@@ -37,28 +37,17 @@
         <script src="chat.js"></script>
     <script src="angular-ui-router/release/angular-ui-router.min.js"></script>
     <script src="login_app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
   </head>
   <%if (login) { %>
-<!-- <body ng-app="sampleapp" ng-controller="mainCtrl"  >
-              <div ui-view></div>
-    </body> -->
-
-
-
-
-    <body ng-app="chatApp" ng-controller="mainCtrl">
-  <div ui-view></div>
-  <toaster-container></toaster-container>
-  
-  </body>
-
-
-
-
-<% } else{ %>
-<body ng-app="loginApp">
-  <div ui-view></div>
-  <toaster-container></toaster-container>
-</body>
-<% } %>
+    <body ng-app="chatApp" ng-controller="parentController">
+      <div ui-view></div>
+      <toaster-container></toaster-container>
+    </body>
+  <% } else{ %>
+    <body ng-app="loginApp" style="background: #72A18F;">
+      <div ui-view></div>
+      <toaster-container></toaster-container>
+    </body>
+  <% } %>
 </html>

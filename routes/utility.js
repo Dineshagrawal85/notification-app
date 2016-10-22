@@ -14,7 +14,7 @@ exports.getNotificationFromDB = function(userId,key,cb){
       }
       else{
           var query = "SELECT * FROM  get_all_notification1("+userId+")"
-          console.log(":query",query)
+          //console.log(":query",query)
           connection.query(query, function(err, rows) {
             if (err){
               console.log(":err",err)
@@ -100,7 +100,7 @@ var fetchNewNotification = function(senderId){
             //console.log(":rows",rows.rows[0])   
             //console.log(":rows",rows)
               if(rows.rows.length){
-                console.log(":rows.rows[0].receiver",rows.rows[0].receiver)
+                //console.log(":rows.rows[0].receiver",rows.rows[0].receiver)
                 var receiverIdArray = rows.rows[0].receiver
                 checkActiveUserAndSendNotification(receiverIdArray)
               }
@@ -113,11 +113,11 @@ var fetchNewNotification = function(senderId){
 }
 
 var checkActiveUserAndSendNotification = function(receiverIdArray){
-  console.log(":socketObjDetail",socketObjDetail)
+  //console.log(":socketObjDetail",socketObjDetail)
    for(key in socketObjDetail){
     var userId = socketObjDetail[key].user_info.user_id
     if(receiverIdArray.indexOf(userId)!=-1){
-      console.log(":active_user",userId,"key",key)
+      //console.log(":active_user",userId,"key",key)
       var maxNotificationId = notification[key]["max_id"]
       checkAllNotificationInDB(userId,key,maxNotificationId)
     }
@@ -134,7 +134,7 @@ var checkAllNotificationInDB = function(userId,key,maxNotificationId){
         }
         else{
           var query = "SELECT * FROM  get_new_notification("+userId+","+maxNotificationId+")"
-          console.log(":query",query)
+          //console.log(":query",query)
           connection.query(query, function(err, rows) {
             if (err){
               console.log(":err",err)

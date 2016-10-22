@@ -8,24 +8,6 @@ var notification = require('../notificationhistory').notification
 var pool = require('./pg_pool.js')
 var logger = require('./../logger/log');
 var multer = require('multer');
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.sendFile('/home/Dinesh/work/socket/views/page1.html');
-});
-
-/*router.get('/demo',function(req,res,next){
-	console.log(":demo")
-	console.log(":req.path",req.path)
-	req.path = "/demo/set"
-	req.url = "/demo/set"
-	console.log(":req.path",req.path)
-	console.log(":req.url",req.url)
-	next();
-})
-
-router.get('/demo/set',function(req,res,next){
-	console.log(":req")
-})*/
 
 router.post('/update/all',function(req,res,next){
   try{
@@ -38,16 +20,13 @@ router.post('/update/all',function(req,res,next){
   }
   pool.acquire(function(err,connection){
       if(err){
-        console.log(":err",err)
         logger.log("error","Error connection to database "+err)
         return res.json({"statusCode":0})
       }
       else{
           var query = "update user_detail set last_read_timestamp = now()::timestamp with time zone where id = " +  userId
-          console.log(":query",query)
           connection.query(query, function(err, rows) {
             if (err){
-              console.log(":err",err)
               logger.log("error","Error Executing query "+query+ " \nError "+err)
               return res.json({"statusCode":0}) 
             }
@@ -93,7 +72,6 @@ var saveUserDetails = function(user_name,img_url,hashCreated,saltToString, cb){
       }
       else{
           var query = "select * from public.save_user_details('"+user_name+"','"+img_url+"','"+hashCreated+"','"+saltToString+"')"
-          console.log(":query",query)
           connection.query(query, function(err, rows) {
             if (err){
               logger.log("error","Error Executing query "+query+ " \nError "+err)
@@ -120,7 +98,6 @@ var saveUserAssociation = function(userId,cb){
       }
       else{
           var query = "insert into user_association (source_user,associated_user) values("+userId+",'{1,2,4,5}')"
-          console.log(":query",query)
           connection.query(query, function(err, rows) {
             if (err){
               logger.log("error","Error Executing query "+query+ " \nError "+err)
@@ -143,7 +120,6 @@ var saveUserSubscriptionMap = function(user_id,subsciptionArray,cb){
       }
       else{
           var query = "select * from public.post_user_subscriptions('["+subsciptionArray+"]',"+user_id+")"
-          console.log(":query",query)
           connection.query(query, function(err, rows) {
             if (err){
               logger.log("error","Error Executing query "+query+ " \nError "+err)
@@ -180,7 +156,6 @@ router.post('/login',function(req,res,next){
                 if(generatedPassword == result["hash"]){
                   var userDetail = {"user_id":result["id"],"user_name":result["name"],"img_url":result["img_url"]}
                   req.session.userDetail = userDetail
-                  console.log(":req.session",req.session)
                   res.json({"statusCode":1,"loggedIn":true,"userDetail":userDetail})
                 }else{
                   res.json({"statusCode":1,"loggedIn":false,"Message":"Wrong Password"})
@@ -206,11 +181,10 @@ var storage =   multer.diskStorage({
 
 var upload = multer({ storage : storage}).single('file');
 router.post('/signup',function(req,res,next){
+  return res.json({"statusCode":0});
   var img_url = ""
   upload(req,res,function(err) {
-        console.log(">>>>>>>2",req.file);
         if(err) {
-            console.log("File uploading error");
             logger.log("error","File uploading error"+err)
             return res.json({"statusCode":0});
         }else{
@@ -250,19 +224,12 @@ router.post('/signup',function(req,res,next){
   })
 })
 
-router.get('/session',function(req,res,next){
-  setInterval(function(){
-    console.log(":req.sesssion",req.session.cookie.originalMaxAge)
-  },2000)
-
-  XCsSUWmebuDkFUZyJ5w94E5oBJnTawq9
-  res.json(req.session.id)
-})
 
 router.get('/logout',function(req,res,next){
   req.session.destroy(function(err,result){
      if(err){
        logger.log("error","Error in destroying user session")
+       return res.json({"statusCode":0});
      }
      else
      {
