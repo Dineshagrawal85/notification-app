@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var ejs = require('ejs');
 var path = require('path')
+var compression  = require('compression');
 
 var app = express();
 var array = require('./array.js')
@@ -39,6 +40,8 @@ app.get('/',function(req,res,next){
   }
 })
 
+app.use(compression({ threshold: 0 }));
+app.use('/assets',express.static(path.join(__dirname, 'public/assets'),{ maxAge: 100000000 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 

@@ -6,6 +6,7 @@ var notification = require('../notificationhistory').notification
 var utility = require('../routes/utility.js')
 var array = require('./../array')
 var logger = require('./../logger/log');
+var _ = require('underscore')
 
 module.exports = function(io){
 io.sockets.on('connection', function (socket) {
@@ -23,10 +24,6 @@ io.sockets.on('connection', function (socket) {
         var keysObj = Object.keys(io.sockets.connected)
         var indexOfCurrentClient = keysObj.indexOf(key);
         keysObj.splice(indexOfCurrentClient,1)
-        for(a in keysObj){
-          console.log(":key a",a)
-          //notification[keysObj[a]]["count"] += 1
-        }
         var notificationDetail = {"type":"Ping in chat","id":socketObjDetail[key]["user_info"]["user_id"]}
         notificationDetail["name"] = socketObjDetail[key]["user_info"]["user_name"]
         socket.broadcast.emit('newmessage',{'message':data.message,"notification":notificationDetail})
@@ -79,7 +76,7 @@ io.sockets.on('connection', function (socket) {
           return
         }
         socket.emit('message',
-          { message: 'Welcome to the Chat System - By \'Dinesh Agrawal\'',
+          { message: 'Welcome to the Chatify - By \'Dinesh Agrawal\'',
             "count":notification[socket.id]["count"],
             "list":notification[socket.id]["list"],
             "read":notification[socket.id]["read"],
@@ -92,7 +89,17 @@ io.sockets.on('connection', function (socket) {
     //Step 1:- Destination user will be sent a proposal of chat with details of 
     //source user
     socket.on('private-chat-request',function(obj){
-      for(key in socketObjDetail){
+      console.log("socketObjDetail",socketObjDetail)
+
+
+        var jsonMatch;
+        _.find(socketObjDetail, function(singleObj,key){
+            if(singleObj.user_info.user_id == obj["user_id"]){jsonMatch={'key':key};return true;} 
+        });
+        jsonMatch = (jsonMatch != undefined)?io.sockets.connected[jsonMatch.key].emit('private-chat-proposal',socketObjDetail[socket.id]["user_info"]):jsonMatch;
+
+
+      /*for(key in socketObjDetail){
         var userId = socketObjDetail[key].user_info.user_id
         if(userId == obj["user_id"]){
           console.log(":active_user",userId,"key",key)
@@ -100,7 +107,7 @@ io.sockets.on('connection', function (socket) {
           console.log(":socketObjDetail",socketObjDetail)
           io.sockets.connected[key].emit('private-chat-proposal',socketObjDetail[socket.id]["user_info"])
         }
-      }
+      }*/
     })
 
     //Called when a Destination User replies for a Private Chat Proposal
